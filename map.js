@@ -28,20 +28,11 @@ var country_group = g.append("g")
 var arc_group = g.append("g")
     .attr("id", "arcs");
 
-d3.json("world-countries.json", function(countries) {
-	// TODO: build the URL to get_data here
-        
-	d3.json("collab2008.json", function(network) {
-	  country_group.selectAll("path")
-	      .data(countries.features)
-	    .enter().append("path")
-	      .attr("d", path)
-		  .attr("country_code", function(d) { return d.id; })
-	      .on("click", click);                      
-
-      arc_group.selectAll("path")
-          .data(network.links)
-        .enter().append("path")
+function loadNetwork() {
+	d3.json("collab2008.json", function(network) {    
+            arc_group.selectAll("path")
+            .data(network.links)
+            .enter().append("path")
             .attr("d", function(d) {
                   var source_country = country_group.selectAll('[country_code=' + network.nodes[d.source].id + ']').datum();
                   var target_country = country_group.selectAll('[country_code=' + network.nodes[d.target].id + ']').datum();
@@ -49,10 +40,25 @@ d3.json("world-countries.json", function(countries) {
                               type: "LineString",
                               coordinates: [path.centroid(source_country), path.centroid(target_country)]
                               });
-             })
-            ;
-	});
+                  })
+            ;    
+            });            
+}
+
+d3.json("world-countries.json", function(countries) {
+	// TODO: build the URL to get_data here
+        
+    country_group.selectAll("path")
+      .data(countries.features)
+    .enter().append("path")
+      .attr("d", path)
+      .attr("country_code", function(d) { return d.id; })
+      .on("click", click);                      
+
+//    FIX path for LineString. Then uncomment this line. See: http://stackoverflow.com/questions/13468609/why-is-d3-geo-path-giving-nan
+    loadNetwork();
 });
+
 
 function click(d) {
   var x = 0,
