@@ -29,25 +29,28 @@ var arc_group = g.append("g")
     .attr("id", "arcs");
 
 function loadNetwork() {
+	// TODO: build the URL to get_data here	
 	d3.json("collab2008.json", function(network) {    
             arc_group.selectAll("path")
-            .data(network.links)
-            .enter().append("path")
-            .attr("d", function(d) {
-                  var source_country = country_group.selectAll('[country_code=' + network.nodes[d.source].id + ']').datum();
-                  var target_country = country_group.selectAll('[country_code=' + network.nodes[d.target].id + ']').datum();
-                  return path({
-                              type: "LineString",
-                              coordinates: [path.centroid(source_country), path.centroid(target_country)]
-                              });
-                  })
-            ;    
-            });            
+				.data(network.links)
+              .enter().append("path")
+ 			    .attr("class", "arc")
+            	.attr("d", function(d) {
+					var tmp_src = country_group.selectAll('[country_code=' + network.nodes[d.source].id + ']');
+					var tmp_tgt = country_group.selectAll('[country_code=' + network.nodes[d.target].id + ']');
+
+					if (tmp_src[0].length && tmp_tgt[0].length ) {
+						var source_country = tmp_src.datum();
+						var target_country = tmp_tgt.datum();
+						var line = d3.svg.line();
+						return line([path.centroid(source_country), path.centroid(target_country)]);				  
+					} 
+	              })
+					;    
+	        });            
 }
 
 d3.json("world-countries.json", function(countries) {
-	// TODO: build the URL to get_data here
-        
     country_group.selectAll("path")
       .data(countries.features)
     .enter().append("path")
@@ -55,7 +58,6 @@ d3.json("world-countries.json", function(countries) {
       .attr("country_code", function(d) { return d.id; })
       .on("click", click);                      
 
-//    FIX path for LineString. Then uncomment this line. See: http://stackoverflow.com/questions/13468609/why-is-d3-geo-path-giving-nan
     loadNetwork();
 });
 
