@@ -1,7 +1,7 @@
 function Map() {
 	// parameters
-	this.width = 960;
-	this.height = 500;
+	this.width = 400;
+	this.height = 350;
 	this.selector = "#mapview > #map";
 
 	// public properties
@@ -40,13 +40,23 @@ Map.prototype.init = function() {
 
 	this.arc_group = this.g.append("g")
 	    .attr("id", "arcs");
+
+	// load the base map
+	d3.json("world-countries.json", function(countries) {
+	    map.country_group.selectAll("path")
+	      .data(countries.features)
+	    .enter().append("path")
+	      .attr("d", map.path)
+	      .attr("country_code", function(d) { return d.id; })
+	      .on("click", map.click);                      
+	});
 }
 
 Map.prototype.loadNetwork = function() {
 	// TODO: build the URL to get_data here	
 	d3.json("collab2008.json", function(network) {    
-		// Question: I wanted to use "this.arc_group", but I don't think 
-		// I understand JS' "this" keyword. Is it "right" to use "map" here instead?
+		// Question: I wanted to use "this.arc_group", but 
+		// I don't understand JS' "this" keyword. help!
             var arcs = map.arc_group.selectAll("path")
 				.data(network.links);
 			
@@ -69,19 +79,6 @@ Map.prototype.loadNetwork = function() {
 			  .exit()
 			    .remove();			    
 	        });            
-}
-
-Map.prototype.loadMap = function() {
-	d3.json("world-countries.json", function(countries) {
-	    map.country_group.selectAll("path")
-	      .data(countries.features)
-	    .enter().append("path")
-	      .attr("d", map.path)
-	      .attr("country_code", function(d) { return d.id; })
-	      .on("click", map.click);                      
-
-	    map.loadNetwork();
-	});
 }
 
 Map.prototype.click = function (d) {
@@ -108,9 +105,3 @@ Map.prototype.click = function (d) {
 	  .attr("transform", "scale(" + k + ")translate(" + x + "," + y + ")")
 	  .style("stroke-width", 1.5 / k + "px");
 }
-
-var map = new Map();
-map.init()
-map.loadMap()
-
-
