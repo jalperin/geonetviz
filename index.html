@@ -50,9 +50,11 @@
 	<body>
 		<div id="matrixview"><h2> Matrix View </h2><div id="matrix"></div></div>		
 		<div id="mapview"><h2> Map View </h2><div id="map"></div></div>
+		<div id="nodelink"><h2> Node-Link View </h2><div id="map"></div></div>
 
 		<script src="map.js" type="text/javascript"></script>				
 		<script src="matrix.js" type="text/javascript"></script>						
+		<script src="nodelink.js" type="text/javascript"></script>						
 
 		<script type="text/javascript">
 			var matrix = new Matrix();
@@ -62,7 +64,12 @@
 
 			var map = new Map();
 			map.init()
-			map.loadNetwork()		
+			map.loadNetwork()
+
+			var nodelink = new NodeLink();
+			nodelink.init()
+			nodelink.loadNetwork()	
+
 		</script>
 	</body>
 </html>
