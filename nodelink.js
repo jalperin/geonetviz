@@ -1,7 +1,7 @@
 // This implementation is based on Mike Bostock's co-ocurrence matrix 
 // http://bost.ocks.org/mike/miserables/
 
-function Matrix() {
+function NodeLink() {
 	// parameters
 	this.margin = {top: 20, right: 10, bottom: 10, left: 20};
 	this.width = 400;
@@ -18,7 +18,7 @@ function Matrix() {
 
 
 
-Matrix.prototype.init = function() {
+NodeLink.prototype.init = function() {
 	this.x = d3.scale.ordinal().rangeBands([0, this.width]);
 	// FIXME: this requires a maximum to come from the data
 	this.z = d3.scale.linear().domain([0, 1000]).clamp(true);
@@ -32,7 +32,7 @@ Matrix.prototype.init = function() {
 	    .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 }
 
-Matrix.prototype.row = function(row) {
+NodeLink.prototype.row = function(row) {
 	var cell = d3.select(this).selectAll(".cell")
 		.data(row.links);
 	
@@ -55,7 +55,7 @@ Matrix.prototype.row = function(row) {
 // 	      .on("mouseout", mouseout);
 }
 
-Matrix.prototype.loadNetwork = function() {
+NodeLink.prototype.loadNetwork = function() {
 	// TODO: build the URL to get_data here	
 	d3.json("collab2008.json", function(network) {    
 
