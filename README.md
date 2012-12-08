@@ -6,6 +6,8 @@ finally a way to easily visualize networks with a geographic dimension
 
 --- for django project ---
 
+edit geonetviz/geonetviz/settings.py and change the TEMPLATES directory (it's the one that has "primer" in the path)
+
 to get things started, just try:
 $ cd geonetviz
 $ python manage.py runserver
