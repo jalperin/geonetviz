@@ -8,6 +8,12 @@ import datetime, random
 import networkx as nx
 from networkx.readwrite import json_graph
 
+def index(request):
+    t = loader.get_template("index.html")
+    c = Context({})
+
+    return HttpResponse(t.render(c))
+
 @csrf_exempt
 def upload(request):
     f = request.FILES['ds']

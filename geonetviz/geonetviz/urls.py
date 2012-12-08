@@ -17,4 +17,5 @@ urlpatterns = patterns('',
 
     url(r'^upload/', 'server.views.upload'),
     url(r'^get/(?P<ds_id>.*)/?$', 'server.views.get_ds'),
+    url(r'^/?$', 'server.views.index'),
 )
