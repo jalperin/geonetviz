@@ -17,7 +17,6 @@ function NodeLink() {
 }
 
 NodeLink.prototype.redraw = function() {
-  console.log("here", d3.event.translate, d3.event.scale);
    nodelink.svg.attr("transform",
       "translate(" + d3.event.translate + ")"
       + " scale(" + d3.event.scale + ")");
