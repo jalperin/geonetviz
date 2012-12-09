@@ -72,4 +72,17 @@ def upload(request):
 
 def get_ds(request, ds_id):
     G = pickle.load(open("DATASETS/graph%s.pickle" % ds_id, 'r'))
+
+    pp = pprint.PrettyPrinter(stream=sys.stderr)
+    pp.pprint(json.loads(request.GET['json']))
+
+    params = json.loads(request.GET['json'])
+
+    for filter in params['filters']:
+        SG = G.subgraph(
+            [n for n, attrdict in G.node.items() if
+                filter in attrdict and attrdict[filter] in params['filters'][filter]])
+        G=SG
+
+    pp.pprint(G.nodes(data=True))
     return HttpResponse(json.dumps(json_graph.node_link_data(G)), mimetype="application/json")
