@@ -4,8 +4,8 @@
 function Matrix() {
 	// parameters
 	this.margin = {top: 20, right: 10, bottom: 10, left: 20};
-	this.width = 400;
-	this.height = 350;
+	this.width = 1000;
+	this.height = 1000;
 	this.selector = "#matrixview > #matrix";
 
 	// public properties
@@ -41,8 +41,8 @@ Matrix.prototype.row = function(row) {
 	cell
 	  .enter().append("rect");
 
-	// cell
-	//   .exit().remove();
+	cell
+	  .exit().remove();
 
 	cell
 	      .attr("class", "cell")
@@ -75,24 +75,36 @@ Matrix.prototype.loadNetwork = function(network) {
 		// nodes[link.target].count += link.weight;
 	});
 
+	var rowSelection = thematrix.svg.selectAll(".row")
+		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: thematrix.matrix[i]}; }))
+ 	  .exit()
+		.remove();
+
+	var columnSelection = thematrix.svg.selectAll(".column")
+		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: thematrix.matrix[i]}; }))
+ 	  .exit()
+		.remove();
+
 	// add in rows that are needed
 	// NOTE: this implementation does not allow for client-side filtering
 	// it depends on the node indexes for the position of the cells
 	// any deletions will caude indexes to not align with right row
-	var rowSelection = thematrix.svg.selectAll(".row")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: thematrix.matrix[i]}; }))
+	rowSelection = thematrix.svg.selectAll(".row")
+		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, region: node.region, links: thematrix.matrix[i]}; }))
 	  .enter().append("g")
 		.attr("class", "row")
-		.attr("transform", function(d, i) { return "translate(0," + thematrix.x(i) + ")"; })
-		.each(thematrix.row);
+		.attr("transform", function(d, i) { return "translate(0," + thematrix.x(i) + ")"; });
 
 	// remove columns that are not part of the filter
-	var columnSelection = thematrix.svg.selectAll(".column")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: thematrix.matrix[i]}; }))
+	columnSelection = thematrix.svg.selectAll(".column")
+		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, region: node.region, links: thematrix.matrix[i]}; }))
 	  .enter().append("g")
 		.attr("class", "column")
 		.attr("transform", function(d, i) { return "translate(" + thematrix.x(i) + ")rotate(-90)"; });
 
+	// add in the cells, for new rows and for existing rows
+	rowSelection = thematrix.svg.selectAll(".row")
+			.each(thematrix.row);
 
 	rowSelection.append("line")
 		.attr("x2", thematrix.width);
@@ -105,6 +117,7 @@ Matrix.prototype.loadNetwork = function(network) {
 		.attr("y", thematrix.x.rangeBand() / 4)
 		.attr("dy", ".01em")
 		.attr("text-anchor", "end")
+		.attr("fill", function(d) { return colourscale(d.region) })
 		.text(function(d) { return d.id });
 
 	columnSelection.append("text")
@@ -112,5 +125,6 @@ Matrix.prototype.loadNetwork = function(network) {
 		.attr("y", thematrix.x.rangeBand() / 4)
 		.attr("dy", ".01em")
 		.attr("text-anchor", "start")
+		.attr("fill", function(d) { return colourscale(d.region) })
 		.text(function(d) { return d.id });
 }

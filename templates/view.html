@@ -91,6 +91,9 @@
 		<script src="/static/matrix.js" type="text/javascript"></script>
 
 		<script type="text/javascript">
+			// a common colour scale for ordinal data
+			var colourscale = d3.scale.category20();
+
 			var pathArray = window.location.pathname.split( '/' );
 			var ds_id = "";
 

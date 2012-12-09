@@ -1,7 +1,7 @@
 function Map() {
 	// parameters
-	this.width = 600;
-	this.height = 500;
+	this.width = 1000;
+	this.height = 1000;
 	this.selector = "#mapview > #map";
 
 	// public properties
@@ -30,7 +30,6 @@ Map.prototype.init = function() {
 	    .scale(this.projection.scale())
 	    .scaleExtent([this.height, 8 * this.height])
 	    .on("zoom", this.zoommove);
-
 
 	this.svg = d3.select(this.selector).append("svg")
 	    .attr("width", this.width)
@@ -64,10 +63,16 @@ Map.prototype.init = function() {
 }
 
 Map.prototype.loadNetwork = function(network) {
-	var themap = this;
+	// colour the basemap
+	for (var i=0; i < network.nodes.length; i++) {
+		if ( network.nodes[i].region ) {
+			map.country_group.selectAll("path[country_code=" + network.nodes[i].country_code + "]")
+				.attr("fill", colourscale(network.nodes[i].region));
+		}
+	}
 
 	map.data = network;
-	var arcs = themap.arc_group.selectAll("path")
+	var arcs = map.arc_group.selectAll("path")
 		.data(network.links);
 
 	arcs
