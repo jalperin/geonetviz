@@ -4,8 +4,8 @@
 function NodeLink() {
 	// parameters
 	this.margin = {top: 20, right: 10, bottom: 10, left: 20};
-	this.w = 800;
-	this.h = 400;
+	this.w = 1000;
+	this.h = 1000;
 	this.r = 6;
 	this.n = 100;
 	this.selector = "#nodelinkview > #nodelink";
@@ -18,9 +18,6 @@ function NodeLink() {
 
 
 NodeLink.prototype.init = function() {
-
-	this.color = d3.scale.category20();
-
 	this.force = d3.layout.force()
 		.gravity(0.5)
     	.charge(-200)
@@ -66,7 +63,7 @@ NodeLink.prototype.loadNetwork = function(graph) {
   		.attr("cx", function(d) { return d.x; })
   		.attr("cy", function(d) { return d.y; })
   		.attr("r", nodelink.r - .75)
-	 	.style("fill", function(d) { return nodelink.color(d.group); });
+	 	.style("fill", function(d) { return colourscale(d.region); });
 
 	 nodelink.loading.remove();
 
