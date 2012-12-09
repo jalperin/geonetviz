@@ -15,6 +15,7 @@ function NodeLink() {
 	this.force = null;
 
 	this.svg = null;
+	this.tooltip = null;
 	this.node_group = null;
 	this.link_group = null;
 }
@@ -32,6 +33,8 @@ NodeLink.prototype.init = function() {
     	.charge(-200)
    		.linkDistance(50)
    		.size([nodelink.w, nodelink.h]);
+
+	this.tooltip = Tooltip("vis-tooltip", 230);
 
 	this.svg = d3.select(this.selector).append("svg")
     	.attr("width", nodelink.w)
@@ -110,6 +113,13 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		.attr("cy", function(d) { return d.y; })
 		.attr("r", nodelink.r - .75)
 	 	.style("fill", function(d) { return colourscale(d.region); });
+
+	nodes.on("mouseover", function(d) {
+		content = '<p>' + d.country_code + '</span></p>';
+   		content += '<hr class="tooltip-hr">';
+    	content += '<p>' + d.region + '</span></p>';
+   		nodelink.tooltip.showTooltip(content,d3.event);						
+	});
 
 
 	 nodelink.loading.remove();
