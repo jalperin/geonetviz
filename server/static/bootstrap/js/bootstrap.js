@@ -1,5 +1,5 @@
 /* ===================================================
- * bootstrap-transition.js v2.2.1
+ * bootstrap-transition.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#transitions
  * ===================================================
  * Copyright 2012 Twitter, Inc.
@@ -20,13 +20,13 @@
 
 !function ($) {
 
-  "use strict"; // jshint ;_;
-
-
-  /* CSS TRANSITION SUPPORT (http://www.modernizr.com/)
-   * ======================================================= */
-
   $(function () {
+
+    "use strict"; // jshint ;_;
+
+
+    /* CSS TRANSITION SUPPORT (http://www.modernizr.com/)
+     * ======================================================= */
 
     $.support.transition = (function () {
 
@@ -58,7 +58,7 @@
   })
 
 }(window.jQuery);/* ==========================================================
- * bootstrap-alert.js v2.2.1
+ * bootstrap-alert.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#alerts
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
@@ -142,10 +142,12 @@
  /* ALERT DATA-API
   * ============== */
 
-  $(document).on('click.alert.data-api', dismiss, Alert.prototype.close)
+  $(function () {
+    $('body').on('click.alert.data-api', dismiss, Alert.prototype.close)
+  })
 
 }(window.jQuery);/* ============================================================
- * bootstrap-button.js v2.2.1
+ * bootstrap-button.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#buttons
  * ============================================================
  * Copyright 2012 Twitter, Inc.
@@ -231,14 +233,16 @@
  /* BUTTON DATA-API
   * =============== */
 
-  $(document).on('click.button.data-api', '[data-toggle^=button]', function (e) {
-    var $btn = $(e.target)
-    if (!$btn.hasClass('btn')) $btn = $btn.closest('.btn')
-    $btn.button('toggle')
+  $(function () {
+    $('body').on('click.button.data-api', '[data-toggle^=button]', function ( e ) {
+      var $btn = $(e.target)
+      if (!$btn.hasClass('btn')) $btn = $btn.closest('.btn')
+      $btn.button('toggle')
+    })
   })
 
 }(window.jQuery);/* ==========================================================
- * bootstrap-carousel.js v2.2.1
+ * bootstrap-carousel.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#carousel
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
@@ -333,17 +337,15 @@
         , direction = type == 'next' ? 'left' : 'right'
         , fallback  = type == 'next' ? 'first' : 'last'
         , that = this
-        , e
+        , e = $.Event('slide', {
+            relatedTarget: $next[0]
+          })
 
       this.sliding = true
 
       isCycling && this.pause()
 
       $next = $next.length ? $next : this.$element.find('.item')[fallback]()
-
-      e = $.Event('slide', {
-        relatedTarget: $next[0]
-      })
 
       if ($next.hasClass('active')) return
 
@@ -404,16 +406,18 @@
  /* CAROUSEL DATA-API
   * ================= */
 
-  $(document).on('click.carousel.data-api', '[data-slide]', function (e) {
-    var $this = $(this), href
-      , $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
-      , options = $.extend({}, $target.data(), $this.data())
-    $target.carousel(options)
-    e.preventDefault()
+  $(function () {
+    $('body').on('click.carousel.data-api', '[data-slide]', function ( e ) {
+      var $this = $(this), href
+        , $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
+        , options = !$target.data('modal') && $.extend({}, $target.data(), $this.data())
+      $target.carousel(options)
+      e.preventDefault()
+    })
   })
 
 }(window.jQuery);/* =============================================================
- * bootstrap-collapse.js v2.2.1
+ * bootstrap-collapse.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#collapse
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -557,18 +561,20 @@
  /* COLLAPSIBLE DATA-API
   * ==================== */
 
-  $(document).on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
-    var $this = $(this), href
-      , target = $this.attr('data-target')
-        || e.preventDefault()
-        || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') //strip for ie7
-      , option = $(target).data('collapse') ? 'toggle' : $this.data()
-    $this[$(target).hasClass('in') ? 'addClass' : 'removeClass']('collapsed')
-    $(target).collapse(option)
+  $(function () {
+    $('body').on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
+      var $this = $(this), href
+        , target = $this.attr('data-target')
+          || e.preventDefault()
+          || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') //strip for ie7
+        , option = $(target).data('collapse') ? 'toggle' : $this.data()
+      $this[$(target).hasClass('in') ? 'addClass' : 'removeClass']('collapsed')
+      $(target).collapse(option)
+    })
   })
 
 }(window.jQuery);/* ============================================================
- * bootstrap-dropdown.js v2.2.1
+ * bootstrap-dropdown.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#dropdowns
  * ============================================================
  * Copyright 2012 Twitter, Inc.
@@ -669,9 +675,8 @@
   }
 
   function clearMenus() {
-    $(toggle).each(function () {
-      getParent($(this)).removeClass('open')
-    })
+    getParent($(toggle))
+      .removeClass('open')
   }
 
   function getParent($this) {
@@ -708,14 +713,17 @@
   /* APPLY TO STANDARD DROPDOWN ELEMENTS
    * =================================== */
 
-  $(document)
-    .on('click.dropdown.data-api touchstart.dropdown.data-api', clearMenus)
-    .on('click.dropdown touchstart.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
-    .on('click.dropdown.data-api touchstart.dropdown.data-api'  , toggle, Dropdown.prototype.toggle)
-    .on('keydown.dropdown.data-api touchstart.dropdown.data-api', toggle + ', [role=menu]' , Dropdown.prototype.keydown)
+  $(function () {
+    $('html')
+      .on('click.dropdown.data-api touchstart.dropdown.data-api', clearMenus)
+    $('body')
+      .on('click.dropdown touchstart.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+      .on('click.dropdown.data-api touchstart.dropdown.data-api'  , toggle, Dropdown.prototype.toggle)
+      .on('keydown.dropdown.data-api touchstart.dropdown.data-api', toggle + ', [role=menu]' , Dropdown.prototype.keydown)
+  })
 
 }(window.jQuery);/* =========================================================
- * bootstrap-modal.js v2.2.1
+ * bootstrap-modal.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#modals
  * =========================================================
  * Copyright 2012 Twitter, Inc.
@@ -765,6 +773,8 @@
 
         if (this.isShown || e.isDefaultPrevented()) return
 
+        $('body').addClass('modal-open')
+
         this.isShown = true
 
         this.escape()
@@ -786,12 +796,13 @@
           that.$element
             .addClass('in')
             .attr('aria-hidden', false)
+            .focus()
 
           that.enforceFocus()
 
           transition ?
-            that.$element.one($.support.transition.end, function () { that.$element.focus().trigger('shown') }) :
-            that.$element.focus().trigger('shown')
+            that.$element.one($.support.transition.end, function () { that.$element.trigger('shown') }) :
+            that.$element.trigger('shown')
 
         })
       }
@@ -808,6 +819,8 @@
         if (!this.isShown || e.isDefaultPrevented()) return
 
         this.isShown = false
+
+        $('body').removeClass('modal-open')
 
         this.escape()
 
@@ -878,11 +891,9 @@
           this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
             .appendTo(document.body)
 
-          this.$backdrop.click(
-            this.options.backdrop == 'static' ?
-              $.proxy(this.$element[0].focus, this.$element[0])
-            : $.proxy(this.hide, this)
-          )
+          if (this.options.backdrop != 'static') {
+            this.$backdrop.click($.proxy(this.hide, this))
+          }
 
           if (doAnimate) this.$backdrop[0].offsetWidth // force reflow
 
@@ -932,24 +943,25 @@
  /* MODAL DATA-API
   * ============== */
 
-  $(document).on('click.modal.data-api', '[data-toggle="modal"]', function (e) {
-    var $this = $(this)
-      , href = $this.attr('href')
-      , $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) //strip for ie7
-      , option = $target.data('modal') ? 'toggle' : $.extend({ remote:!/#/.test(href) && href }, $target.data(), $this.data())
+  $(function () {
+    $('body').on('click.modal.data-api', '[data-toggle="modal"]', function ( e ) {
+      var $this = $(this)
+        , href = $this.attr('href')
+        , $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) //strip for ie7
+        , option = $target.data('modal') ? 'toggle' : $.extend({ remote: !/#/.test(href) && href }, $target.data(), $this.data())
 
-    e.preventDefault()
+      e.preventDefault()
 
-    $target
-      .modal(option)
-      .one('hide', function () {
-        $this.focus()
-      })
+      $target
+        .modal(option)
+        .one('hide', function () {
+          $this.focus()
+        })
+    })
   })
 
-}(window.jQuery);
-/* ===========================================================
- * bootstrap-tooltip.js v2.2.1
+}(window.jQuery);/* ===========================================================
+ * bootstrap-tooltip.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#tooltips
  * Inspired by the original jQuery.tipsy by Jason Frame
  * ===========================================================
@@ -1069,9 +1081,9 @@
         inside = /in/.test(placement)
 
         $tip
-          .detach()
+          .remove()
           .css({ top: 0, left: 0, display: 'block' })
-          .insertAfter(this.$element)
+          .appendTo(inside ? this.$element : document.body)
 
         pos = this.getPosition(inside)
 
@@ -1094,7 +1106,7 @@
         }
 
         $tip
-          .offset(tp)
+          .css(tp)
           .addClass(placement)
           .addClass('in')
       }
@@ -1116,18 +1128,18 @@
 
       function removeWithAnimation() {
         var timeout = setTimeout(function () {
-          $tip.off($.support.transition.end).detach()
+          $tip.off($.support.transition.end).remove()
         }, 500)
 
         $tip.one($.support.transition.end, function () {
           clearTimeout(timeout)
-          $tip.detach()
+          $tip.remove()
         })
       }
 
       $.support.transition && this.$tip.hasClass('fade') ?
         removeWithAnimation() :
-        $tip.detach()
+        $tip.remove()
 
       return this
     }
@@ -1185,9 +1197,8 @@
       this.enabled = !this.enabled
     }
 
-  , toggle: function (e) {
-      var self = $(e.currentTarget)[this.type](this._options).data(this.type)
-      self[self.tip().hasClass('in') ? 'hide' : 'show']()
+  , toggle: function () {
+      this[this.tip().hasClass('in') ? 'hide' : 'show']()
     }
 
   , destroy: function () {
@@ -1220,11 +1231,12 @@
   , trigger: 'hover'
   , title: ''
   , delay: 0
-  , html: false
+  , html: true
   }
 
-}(window.jQuery);/* ===========================================================
- * bootstrap-popover.js v2.2.1
+}(window.jQuery);
+/* ===========================================================
+ * bootstrap-popover.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#popovers
  * ===========================================================
  * Copyright 2012 Twitter, Inc.
@@ -1326,7 +1338,7 @@
   })
 
 }(window.jQuery);/* =============================================================
- * bootstrap-scrollspy.js v2.2.1
+ * bootstrap-scrollspy.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#scrollspy
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -1476,7 +1488,7 @@
   })
 
 }(window.jQuery);/* ========================================================
- * bootstrap-tab.js v2.2.1
+ * bootstrap-tab.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#tabs
  * ========================================================
  * Copyright 2012 Twitter, Inc.
@@ -1526,7 +1538,7 @@
 
       if ( $this.parent('li').hasClass('active') ) return
 
-      previous = $ul.find('.active:last a')[0]
+      previous = $ul.find('.active a').last()[0]
 
       e = $.Event('show', {
         relatedTarget: previous
@@ -1602,13 +1614,15 @@
  /* TAB DATA-API
   * ============ */
 
-  $(document).on('click.tab.data-api', '[data-toggle="tab"], [data-toggle="pill"]', function (e) {
-    e.preventDefault()
-    $(this).tab('show')
+  $(function () {
+    $('body').on('click.tab.data-api', '[data-toggle="tab"], [data-toggle="pill"]', function (e) {
+      e.preventDefault()
+      $(this).tab('show')
+    })
   })
 
 }(window.jQuery);/* =============================================================
- * bootstrap-typeahead.js v2.2.1
+ * bootstrap-typeahead.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#typeahead
  * =============================================================
  * Copyright 2012 Twitter, Inc.
@@ -1783,22 +1797,13 @@
         .on('keypress', $.proxy(this.keypress, this))
         .on('keyup',    $.proxy(this.keyup, this))
 
-      if (this.eventSupported('keydown')) {
+      if ($.browser.chrome || $.browser.webkit || $.browser.msie) {
         this.$element.on('keydown', $.proxy(this.keydown, this))
       }
 
       this.$menu
         .on('click', $.proxy(this.click, this))
         .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
-    }
-
-  , eventSupported: function(eventName) {
-      var isSupported = eventName in this.$element
-      if (!isSupported) {
-        this.$element.setAttribute(eventName, 'return;')
-        isSupported = typeof this.$element[eventName] === 'function'
-      }
-      return isSupported
     }
 
   , move: function (e) {
@@ -1839,9 +1844,6 @@
       switch(e.keyCode) {
         case 40: // down arrow
         case 38: // up arrow
-        case 16: // shift
-        case 17: // ctrl
-        case 18: // alt
           break
 
         case 9: // tab
@@ -1909,16 +1911,592 @@
  /*   TYPEAHEAD DATA-API
   * ================== */
 
-  $(document).on('focus.typeahead.data-api', '[data-provide="typeahead"]', function (e) {
-    var $this = $(this)
-    if ($this.data('typeahead')) return
-    e.preventDefault()
-    $this.typeahead($this.data())
+  $(function () {
+    $('body').on('focus.typeahead.data-api', '[data-provide="typeahead"]', function (e) {
+      var $this = $(this)
+      if ($this.data('typeahead')) return
+      e.preventDefault()
+      $this.typeahead($this.data())
+    })
   })
 
 }(window.jQuery);
+/* ===========================================================
+ * bootstrap-inputmask.js j2
+ * http://twitter.github.com/bootstrap/javascript.html#tooltips
+ * Based on Masked Input plugin by Josh Bush (digitalbush.com)
+ * ===========================================================
+ * Copyright 2012 Jasny BV, Netherlands.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ========================================================== */
+
+!function ($) {
+
+  "use strict"; // jshint ;_;
+
+  var isIphone = (window.orientation !== undefined),
+      isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1
+
+  $.mask = {
+    //Predefined character definitions
+    definitions: {
+      '9': "[0-9]",
+      'a': "[A-Za-z]",
+      '?': "[A-Za-z0-9]",
+      '*': "."
+    },
+    dataName:"rawMaskFn"
+  }
+
+
+ /* INPUTMASK PUBLIC CLASS DEFINITION
+  * ================================= */
+
+  var Inputmask = function (element, options) {
+    if (isAndroid) return // No support because caret positioning doesn't work on Android
+    
+    this.$element = $(element)
+    this.mask = String(options.mask)
+    this.options = $.extend({}, $.fn.inputmask.defaults, options)
+    
+    this.init()
+    this.listen()
+        
+    this.checkVal() //Perform initial check for existing values
+  }
+
+  Inputmask.prototype = {
+    
+    init: function() {
+      var defs = $.mask.definitions
+      var len = this.mask.length
+
+      this.tests = [] 
+      this.partialPosition = this.mask.length
+      this.firstNonMaskPos = null
+
+      $.each(this.mask.split(""), $.proxy(function(i, c) {
+        if (c == '?') {
+          len--
+          this.partialPosition = i
+        } else if (defs[c]) {
+          this.tests.push(new RegExp(defs[c]))
+          if(this.firstNonMaskPos === null)
+            this.firstNonMaskPos =  this.tests.length - 1
+        } else {
+          this.tests.push(null)
+        }
+      }, this))
+
+      this.buffer = $.map(this.mask.split(""), $.proxy(function(c, i) {
+        if (c != '?') return defs[c] ? this.options.placeholder : c
+      }, this))
+      
+      this.focusText = this.$element.val()
+
+      this.$element.data($.mask.dataName, $.proxy(function() {
+        return $.map(this.buffer, function(c, i) {
+          return this.tests[i] && c != this.options.placeholder ? c : null
+        }).join('')
+      }, this))
+    },
+    
+    listen: function() {
+      if (this.$element.attr("readonly")) return
+
+      var pasteEventName = ($.browser.msie ? 'paste' : 'input') + ".mask"
+
+      this.$element
+        .on("unmask", $.proxy(this.unmask, this))
+        
+        .on("focus.mask", $.proxy(this.focusEvent, this))
+        .on("blur.mask", $.proxy(this.blurEvent, this))
+        
+        .on("keydown.mask", $.proxy(this.keydownEvent, this))
+        .on("keypress.mask", $.proxy(this.keypressEvent, this))
+
+        .on(pasteEventName, $.proxy(this.pasteEvent, this))
+    },
+
+    //Helper Function for Caret positioning
+    caret: function(begin, end) {
+      if (this.$element.length === 0) return
+      if (typeof begin == 'number') {
+        end = (typeof end == 'number') ? end : begin
+        return this.$element.each(function() {
+          if (this.setSelectionRange) {
+            this.setSelectionRange(begin, end)
+          } else if (this.createTextRange) {
+            var range = this.createTextRange()
+            range.collapse(true)
+            range.moveEnd('character', end)
+            range.moveStart('character', begin)
+            range.select()
+          }
+        })
+      } else {
+        if (this.$element[0].setSelectionRange) {
+          begin = this.$element[0].selectionStart
+          end = this.$element[0].selectionEnd
+        } else if (document.selection && document.selection.createRange) {
+          var range = document.selection.createRange()
+          begin = 0 - range.duplicate().moveStart('character', -100000)
+          end = begin + range.text.length
+        }
+        return {
+          begin: begin, 
+          end: end
+        }
+      }
+    },
+    
+    seekNext: function(pos) {
+      var len = this.mask.length
+      while (++pos <= len && !this.tests[pos]);
+      
+      return pos
+    },
+    
+    seekPrev: function(pos) {
+      while (--pos >= 0 && !this.tests[pos]);
+      
+      return pos
+    },
+
+    shiftL: function(begin,end) {
+      var len = this.mask.length
+      
+      if(begin<0) return
+      
+      for (var i = begin,j = this.seekNext(end); i < len; i++) {
+        if (this.tests[i]) {
+          if (j < len && this.tests[i].test(this.buffer[j])) {
+            this.buffer[i] = this.buffer[j]
+            this.buffer[j] = this.options.placeholder
+          } else
+            break
+          j = this.seekNext(j)
+        }
+      }
+      this.writeBuffer()
+      this.caret(Math.max(this.firstNonMaskPos, begin))
+    },
+
+    shiftR: function(pos) {
+      var len = this.mask.length
+      
+      for (var i = pos, c = this.options.placeholder; i < len; i++) {
+        if (this.tests[i]) {
+          var j = this.seekNext(i)
+          var t = this.buffer[i]
+          this.buffer[i] = c
+          if (j < len && this.tests[j].test(t))
+            c = t
+          else
+            break
+        }
+      }
+    },
+
+    unmask: function() {
+      this.$element
+        .unbind(".mask")
+        .removeData("inputmask")
+    },
+    
+    focusEvent: function() {
+      this.focusText = this.$element.val()
+      var len = this.mask.length 
+      var pos = this.checkVal()
+      this.writeBuffer()
+
+      var that = this
+      var moveCaret = function() {
+        if (pos == len)
+          that.caret(0, pos)
+        else
+          that.caret(pos)
+      }
+
+      if ($.browser.msie)
+        moveCaret()
+      else
+        setTimeout(moveCaret, 0)
+    },
+    
+    blurEvent: function() {
+      this.checkVal()
+      if (this.$element.val() != this.focusText)
+        this.$element.trigger('change')
+    },
+        
+    keydownEvent: function(e) {
+      var k=e.which
+
+      //backspace, delete, and escape get special treatment
+      if (k == 8 || k == 46 || (isIphone && k == 127)) {
+        var pos = this.caret(),
+        begin = pos.begin,
+        end = pos.end
+						
+        if (end-begin === 0) {
+          begin = k!=46 ? this.seekPrev(begin) : (end=this.seekNext(begin-1))
+          end = k==46 ? this.seekNext(end) : end
+        }
+        this.clearBuffer(begin, end)
+        this.shiftL(begin,end-1)
+
+        return false
+      } else if (k == 27) {//escape
+        this.$element.val(this.focusText)
+        this.caret(0, this.checkVal())
+        return false
+      }
+    },
+
+    keypressEvent: function(e) {
+      var len = this.mask.length
+      
+      var k = e.which,
+      pos = this.caret()
+
+      if (e.ctrlKey || e.altKey || e.metaKey || k<32)  {//Ignore
+        return true
+      } else if (k) {
+        if (pos.end - pos.begin !== 0) {
+          this.clearBuffer(pos.begin, pos.end)
+          this.shiftL(pos.begin, pos.end-1)
+        }
+
+        var p = this.seekNext(pos.begin - 1)
+        if (p < len) {
+          var c = String.fromCharCode(k)
+          if (this.tests[p].test(c)) {
+            this.shiftR(p)
+            this.buffer[p] = c
+            this.writeBuffer()
+            var next = this.seekNext(p)
+            this.caret(next)
+          }
+        }
+        return false
+      }
+    },
+
+    pasteEvent: function() {
+      var that = this
+      
+      setTimeout(function() {
+        that.caret(that.checkVal(true))
+      }, 0)
+    },
+    
+    clearBuffer: function(start, end) {
+      var len = this.mask.length
+      
+      for (var i = start; i < end && i < len; i++) {
+        if (this.tests[i])
+          this.buffer[i] = this.options.placeholder
+      }
+    },
+
+    writeBuffer: function() {
+      return this.$element.val(this.buffer.join('')).val()
+    },
+
+    checkVal: function(allow) {
+      var len = this.mask.length
+      //try to place characters where they belong
+      var test = this.$element.val()
+      var lastMatch = -1
+      
+      for (var i = 0, pos = 0; i < len; i++) {
+        if (this.tests[i]) {
+          this.buffer[i] = this.options.placeholder
+          while (pos++ < test.length) {
+            var c = test.charAt(pos - 1)
+            if (this.tests[i].test(c)) {
+              this.buffer[i] = c
+              lastMatch = i
+              break
+            }
+          }
+          if (pos > test.length)
+            break
+        } else if (this.buffer[i] == test.charAt(pos) && i != this.partialPosition) {
+          pos++
+          lastMatch = i
+        }
+      }
+      if (!allow && lastMatch + 1 < this.partialPosition) {
+        this.$element.val("")
+        this.clearBuffer(0, len)
+      } else if (allow || lastMatch + 1 >= this.partialPosition) {
+        this.writeBuffer()
+        if (!allow) this.$element.val(this.$element.val().substring(0, lastMatch + 1))
+      }
+      return (this.partialPosition ? i : this.firstNonMaskPos)
+    }
+  }
+
+  
+ /* INPUTMASK PLUGIN DEFINITION
+  * =========================== */
+
+  $.fn.inputmask = function (options) {
+    return this.each(function () {
+      var $this = $(this)
+      , data = $this.data('inputmask')
+      if (!data) $this.data('inputmask', (data = new Inputmask(this, options)))
+    })
+  }
+
+  $.fn.inputmask.defaults = {
+    placeholder: "_"
+  }
+
+  $.fn.inputmask.Constructor = Inputmask
+
+
+ /* INPUTMASK DATA-API
+  * ================== */
+
+  $(function () {
+    $('body').on('focus.inputmask.data-api', '[data-mask]', function (e) {
+      var $this = $(this)
+      if ($this.data('inputmask')) return
+      e.preventDefault()
+      $this.inputmask($this.data())
+    })
+  })
+
+}(window.jQuery)/* ============================================================
+ * bootstrap-rowlink.js j1
+ * http://jasny.github.com/bootstrap/javascript.html#rowlink
+ * ============================================================
+ * Copyright 2012 Jasny BV, Netherlands.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ============================================================ */
+
+!function ($) {
+  
+  "use strict"; // jshint ;_;
+
+  var Rowlink = function (element, options) {
+    options = $.extend({}, $.fn.rowlink.defaults, options)
+    var tr = element.nodeName == 'tr' ? $(element) : $(element).find('tr:has(td)')
+    
+    tr.each(function() {
+      var link = $(this).find(options.target).first()
+      if (!link.length) return
+      
+      var href = link.attr('href')
+
+      $(this).find('td').not('.nolink').click(function() {
+        window.location = href;
+      })
+
+      $(this).addClass('rowlink')
+      link.replaceWith(link.html())
+    })
+  }
+
+  
+ /* ROWLINK PLUGIN DEFINITION
+  * =========================== */
+
+  $.fn.rowlink = function (options) {
+    return this.each(function () {
+      var $this = $(this)
+      , data = $this.data('rowlink')
+      if (!data) $this.data('rowlink', (data = new Rowlink(this, options)))
+    })
+  }
+
+  $.fn.rowlink.defaults = {
+    target: "a"
+  }
+
+  $.fn.rowlink.Constructor = Rowlink
+
+
+ /* ROWLINK DATA-API
+  * ================== */
+
+  $(function () {
+    $('[data-provides="rowlink"]').each(function () {
+      $(this).rowlink($(this).data())
+    })
+  })
+  
+}(window.jQuery)
+/* ===========================================================
+ * bootstrap-fileupload.js j2
+ * http://jasny.github.com/bootstrap/javascript.html#fileupload
+ * ===========================================================
+ * Copyright 2012 Jasny BV, Netherlands.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ========================================================== */
+
+!function ($) {
+
+  "use strict"; // jshint ;_
+
+ /* INPUTMASK PUBLIC CLASS DEFINITION
+  * ================================= */
+
+  var Fileupload = function (element, options) {
+    this.$element = $(element)
+    this.type = this.$element.data('uploadtype') || (this.$element.find('.thumbnail').length > 0 ? "image" : "file")
+      
+    this.$input = this.$element.find(':file')
+    if (this.$input.length === 0) return
+
+    this.name = this.$input.attr('name') || options.name
+
+    this.$hidden = this.$element.find(':hidden[name="'+this.name+'"]')
+    if (this.$hidden.length === 0) {
+      this.$hidden = $('<input type="hidden" />')
+      this.$element.prepend(this.$hidden)
+    }
+
+    this.$preview = this.$element.find('.fileupload-preview')
+    var height = this.$preview.css('height')
+    if (this.$preview.css('display') != 'inline' && height != '0px' && height != 'none') this.$preview.css('line-height', height)
+
+    this.$remove = this.$element.find('[data-dismiss="fileupload"]')
+
+    this.$element.find('[data-trigger="fileupload"]').on('click.fileupload', $.proxy(this.trigger, this))
+
+    this.listen()
+  }
+  
+  Fileupload.prototype = {
+    
+    listen: function() {
+      this.$input.on('change.fileupload', $.proxy(this.change, this))
+      if (this.$remove) this.$remove.on('click.fileupload', $.proxy(this.clear, this))
+    },
+    
+    change: function(e, invoked) {
+      var file = e.target.files !== undefined ? e.target.files[0] : (e.target.value ? { name: e.target.value.replace(/^.+\\/, '') } : null)
+      if (invoked === 'clear') return
+      
+      if (!file) {
+        this.clear()
+        return
+      }
+      
+      this.$hidden.val('')
+      this.$hidden.attr('name', '')
+      this.$input.attr('name', this.name)
+
+      if (this.type === "image" && this.$preview.length > 0 && (typeof file.type !== "undefined" ? file.type.match('image.*') : file.name.match('\\.(gif|png|jpe?g)$')) && typeof FileReader !== "undefined") {
+        var reader = new FileReader()
+        var preview = this.$preview
+        var element = this.$element
+
+        reader.onload = function(e) {
+          preview.html('<img src="' + e.target.result + '" ' + (preview.css('max-height') != 'none' ? 'style="max-height: ' + preview.css('max-height') + ';"' : '') + ' />')
+          element.addClass('fileupload-exists').removeClass('fileupload-new')
+        }
+
+        reader.readAsDataURL(file)
+      } else {
+        this.$preview.text(file.name)
+        this.$element.addClass('fileupload-exists').removeClass('fileupload-new')
+      }
+    },
+
+    clear: function(e) {
+      this.$hidden.val('')
+      this.$hidden.attr('name', this.name)
+      this.$input.attr('name', '')
+      this.$input.val('') // Doesn't work in IE, which causes issues when selecting the same file twice
+
+      this.$preview.html('')
+      this.$element.addClass('fileupload-new').removeClass('fileupload-exists')
+
+      if (e) {
+        this.$input.trigger('change', [ 'clear' ])
+        e.preventDefault()
+      }
+    },
+    
+    trigger: function(e) {
+      this.$input.trigger('click')
+      e.preventDefault()
+    }
+  }
+
+  
+ /* INPUTMASK PLUGIN DEFINITION
+  * =========================== */
+
+  $.fn.fileupload = function (options) {
+    return this.each(function () {
+      var $this = $(this)
+      , data = $this.data('fileupload')
+      if (!data) $this.data('fileupload', (data = new Fileupload(this, options)))
+    })
+  }
+
+  $.fn.fileupload.Constructor = Fileupload
+
+
+ /* INPUTMASK DATA-API
+  * ================== */
+
+  $(function () {
+    $('body').on('click.fileupload.data-api', '[data-provides="fileupload"]', function (e) {
+      var $this = $(this)
+      if ($this.data('fileupload')) return
+      $this.fileupload($this.data())
+      
+      var $target = $(e.target).parents('[data-dismiss=fileupload],[data-trigger=fileupload]').first()
+      if ($target.length > 0) {
+          $target.trigger('click.fileupload')
+          e.preventDefault()
+      }
+    })
+  })
+
+}(window.jQuery)
 /* ==========================================================
- * bootstrap-affix.js v2.2.1
+ * bootstrap-affix.js v2.1.1
  * http://twitter.github.com/bootstrap/javascript.html#affix
  * ==========================================================
  * Copyright 2012 Twitter, Inc.
@@ -1947,9 +2525,7 @@
 
   var Affix = function (element, options) {
     this.options = $.extend({}, $.fn.affix.defaults, options)
-    this.$window = $(window)
-      .on('scroll.affix.data-api', $.proxy(this.checkPosition, this))
-      .on('click.affix.data-api',  $.proxy(function () { setTimeout($.proxy(this.checkPosition, this), 1) }, this))
+    this.$window = $(window).on('scroll.affix.data-api', $.proxy(this.checkPosition, this))
     this.$element = $(element)
     this.checkPosition()
   }

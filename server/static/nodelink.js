@@ -58,7 +58,7 @@ NodeLink.prototype.loadNetwork = function(graph) {
   		.attr("x2", function(d) { return d.target.x; })
   		.attr("y2", function(d) { return d.target.y; })
 		.attr("class", "link")
-	    .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+	    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
 
 	 nodelink.svg.selectAll("circle")
   		.data(graph.nodes)
