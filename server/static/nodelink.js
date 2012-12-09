@@ -1,4 +1,4 @@
-// This implementation is based on Mike Bostock's co-ocurrence matrix 
+// This implementation is based on Mike Bostock's co-ocurrence matrix
 // http://bost.ocks.org/mike/miserables/
 
 function NodeLink() {
@@ -18,7 +18,7 @@ function NodeLink() {
 
 
 NodeLink.prototype.init = function() {
-	
+
 	this.color = d3.scale.category20();
 
 	this.force = d3.layout.force()
@@ -39,43 +39,37 @@ NodeLink.prototype.init = function() {
     .text("simulating. one moment please…");
 }
 
-NodeLink.prototype.loadNetwork = function() {
+NodeLink.prototype.loadNetwork = function(graph) {
+	 setTimeout(function() {
 
-	d3.json("/static/collab2008.json", function(graph) {
+	 nodelink.force
+	     .nodes(graph.nodes)
+		 .links(graph.links)
+		 .start();
 
-		 setTimeout(function() {
-	 						  
-		 nodelink.force
-		     .nodes(graph.nodes)
-			 .links(graph.links)
-			 .start();
+	 for (var i = nodelink.n * nodelink.n; i > 0; --i) nodelink.force.tick();
+	 nodelink.force.stop();
 
-		 for (var i = nodelink.n * nodelink.n; i > 0; --i) nodelink.force.tick();
-		 nodelink.force.stop();
+	 nodelink.svg.selectAll("line")
+  		.data(graph.links)
+	 	.enter().append("line")
+ 		.attr("x1", function(d) { return d.source.x; })
+  		.attr("y1", function(d) { return d.source.y; })
+  		.attr("x2", function(d) { return d.target.x; })
+  		.attr("y2", function(d) { return d.target.y; })
+		.attr("class", "link")
+	    .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-		 nodelink.svg.selectAll("line")
-      		.data(graph.links)
-   		 	.enter().append("line")
-     		.attr("x1", function(d) { return d.source.x; })
-      		.attr("y1", function(d) { return d.source.y; })
-      		.attr("x2", function(d) { return d.target.x; })
-      		.attr("y2", function(d) { return d.target.y; })
-			.attr("class", "link")
-		    .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+	 nodelink.svg.selectAll("circle")
+  		.data(graph.nodes)
+		.enter().append("circle")
+  		.attr("cx", function(d) { return d.x; })
+  		.attr("cy", function(d) { return d.y; })
+  		.attr("r", nodelink.r - .75)
+	 	.style("fill", function(d) { return nodelink.color(d.group); });
 
- 		 nodelink.svg.selectAll("circle")
-      		.data(graph.nodes)
-    		.enter().append("circle")
-      		.attr("cx", function(d) { return d.x; })
-      		.attr("cy", function(d) { return d.y; })
-      		.attr("r", nodelink.r - .75)
-		 	.style("fill", function(d) { return nodelink.color(d.group); });
+	 nodelink.loading.remove();
 
-		 nodelink.loading.remove();
-
-		}, 10);
-
-	});	
-
+	}, 10);
 }
 

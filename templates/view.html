@@ -54,7 +54,7 @@
 		  stroke: #999;
 		  stroke-opacity: .6;
 		}
-	 
+
 		</style>
 		<title></title>
 	</head>
@@ -106,18 +106,18 @@
 			var matrix = new Matrix();
 			matrix.init();
 
-			// var views = [map, nodelink, matrix];
-			var views = [map, matrix];
+			var views = [map, nodelink, matrix];
 
 			function updateViews(filters) {
-				d3.json("/get/" + ds_id, function(network) {
+				d3.json("/get/" + filters.ds_id, function(network) {
 					for ( var i=0; i < views.length; i++ ) {
 						views[i].loadNetwork(network);
 					}
 				});
 			}
 
-			updateViews();
+			updateViews({ds_id: ds_id});
+
 		</script>
 	</body>
 </html>
