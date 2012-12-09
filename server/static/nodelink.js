@@ -4,8 +4,8 @@
 function NodeLink() {
 	// parameters
 	this.margin = {top: 20, right: 10, bottom: 10, left: 20};
-	this.w = 1000;
-	this.h = 1000;
+	this.w = 800;
+	this.h = 500;
 	this.r = 6;
 	this.n = 100;
 	this.selector = "#nodelinkview > #nodelink";
@@ -16,6 +16,13 @@ function NodeLink() {
 	this.force = null;
 }
 
+NodeLink.prototype.redraw = function() {
+  console.log("here", d3.event.translate, d3.event.scale);
+   nodelink.svg.attr("transform",
+      "translate(" + d3.event.translate + ")"
+      + " scale(" + d3.event.scale + ")");
+
+}
 
 NodeLink.prototype.init = function() {
 	this.force = d3.layout.force()
@@ -26,7 +33,16 @@ NodeLink.prototype.init = function() {
 
 	this.svg = d3.select(this.selector).append("svg")
     	.attr("width", nodelink.w)
-    	.attr("height", nodelink.h);
+    	.attr("height", nodelink.h)
+		.attr("pointer-events", "all")
+ 		.append('svg:g')
+   		.call(d3.behavior.zoom().on("zoom", nodelink.redraw))
+  		.append('svg:g');
+
+	this.svg.append('svg:rect')
+    	.attr('width', nodelink.w)
+    	.attr('height', nodelink.h)
+    	.attr('fill', 'white');
 
 	this.loading = this.svg.append("text")
     .attr("x", nodelink.w / 2)
@@ -35,6 +51,8 @@ NodeLink.prototype.init = function() {
     .attr("text-anchor", "middle")
     .text("simulating. one moment please…");
 }
+
+
 
 NodeLink.prototype.loadNetwork = function(graph) {
 	 setTimeout(function() {
