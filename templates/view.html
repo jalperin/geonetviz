@@ -5,6 +5,15 @@
 			<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 		<script src="http://d3js.org/d3.v2.min.js?2.9.6" type="text/javascript">
 </script>
+<script type="text/javascript">
+	// pull out the Dataset ID
+	var pathArray = window.location.pathname.split( '/' );
+	var ds_id = "";
+
+	// handle trailing slash
+	// FIXME? grab second element, or element after "get"?
+	while ( !(ds_id = pathArray.pop()) ) {}
+</script>
 		<style type="text/css">
 
 		svg {
@@ -62,7 +71,10 @@
 		<div class="container">
 
 		<h2>GeoNetViz</h2>
-
+		<input type="button" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22South+America%22%5D%7D%7D')" value="Africa and South America" />
+		<input type="button" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D')" value="Africa and North America" />
+		<input type="button" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22NONE%22%2C%22NONEOTHER%22%5D%7D%7D')" value="None" />
+		<input type="button" onclick="updateViews(ds_id)" value="All" />
 		<div class="tabbable">
 		<ul class="nav nav-tabs">
 		<li class="active"><a href="#mapview" data-toggle="tab">Map View</a></li>
@@ -94,13 +106,6 @@
 			// a common colour scale for ordinal data
 			var colourscale = d3.scale.category20();
 
-			var pathArray = window.location.pathname.split( '/' );
-			var ds_id = "";
-
-			// handle trailing slash
-			while ( !(ds_id = pathArray.pop()) ) {}
-
-
 			// FIXME: when "this" issue is resolved, these should not be needed as globals
 			var map = new Map();
 			map.init();
@@ -111,16 +116,16 @@
 
 			var views = [map, nodelink, matrix];
 
-			function updateViews(filters) {
-				d3.json("/get/" + filters.ds_id, function(network) {
+			function updateViews(ds_id, filters) {
+				d3.json("/get/" + ds_id + "/?" + filters, function(network) {
 					for ( var i=0; i < views.length; i++ ) {
 						views[i].loadNetwork(network);
 					}
 				});
 			}
 
-			updateViews({ds_id: ds_id});
-
+			// updateViews(ds_id, "json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D");
+			updateViews(ds_id);
 		</script>
 	</body>
 </html>

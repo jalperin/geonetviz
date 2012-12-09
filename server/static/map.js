@@ -65,10 +65,8 @@ Map.prototype.init = function() {
 Map.prototype.loadNetwork = function(network) {
 	// colour the basemap
 	for (var i=0; i < network.nodes.length; i++) {
-		if ( network.nodes[i].region ) {
-			map.country_group.selectAll("path[country_code=" + network.nodes[i].country_code + "]")
-				.attr("fill", colourscale(network.nodes[i].region));
-		}
+		map.country_group.selectAll("path[country_code=" + network.nodes[i].country_code + "]")
+			.attr("fill", colourscale(network.nodes[i].region));
 	}
 
 	map.data = network;
@@ -83,6 +81,8 @@ Map.prototype.loadNetwork = function(network) {
 	arcs
 	  .exit()
 	    .remove();
+
+	map.arc_group.selectAll("path").attr("d", map.arcpath);
 }
 
 Map.prototype.arcpath = function(d) {
