@@ -41,7 +41,7 @@
 		 #matrixview {
 			 float: left;
 		 }
-		 
+
 		 #mapview {
 			 float:left;
 	 }
@@ -63,47 +63,61 @@
 
 		<h2>GeoNetViz</h2>
 
-		<div class="tabbable">  
-		<ul class="nav nav-tabs">  
-		<li class="active"><a href="#mapview" data-toggle="tab">Map View</a></li>  
-		<li class=""><a href="#nodelinkview" data-toggle="tab">Node-Link View</a></li>  
-		<li class=""><a href="#matrixview" data-toggle="tab">Matrix View</a></li>  
-		</ul>  
-		<div class="tab-content">  
-			<div class="tab-pane active" id="mapview">  
+		<div class="tabbable">
+		<ul class="nav nav-tabs">
+		<li class="active"><a href="#mapview" data-toggle="tab">Map View</a></li>
+		<li class=""><a href="#nodelinkview" data-toggle="tab">Node-Link View</a></li>
+		<li class=""><a href="#matrixview" data-toggle="tab">Matrix View</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="mapview">
 				<div id="map"> </div>
-			</div>  
-			<div class="tab-pane" id="nodelinkview">  
-				<div id="nodelink"> </div> 
-			</div>  
-			<div class="tab-pane" id="matrixview">  
-				<div id="matrix"> </div> 
-			</div>  
-    	</div>  
+			</div>
+			<div class="tab-pane" id="nodelinkview">
+				<div id="nodelink"> </div>
+			</div>
+			<div class="tab-pane" id="matrixview">
+				<div id="matrix"> </div>
+			</div>
+    	</div>
 
     	</div>
 
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
 		<script src="/static/bootstrap/js/bootstrap.min.js"></script>
 
-		<script src="/static/map.js" type="text/javascript"></script>	
-		<script src="/static/nodelink.js" type="text/javascript"></script>				
-		<script src="/static/matrix.js" type="text/javascript"></script>										
+		<script src="/static/map.js" type="text/javascript"></script>
+		<script src="/static/nodelink.js" type="text/javascript"></script>
+		<script src="/static/matrix.js" type="text/javascript"></script>
 
 		<script type="text/javascript">
+			var pathArray = window.location.pathname.split( '/' );
+			var ds_id = "";
+
+			// handle trailing slash
+			while ( !(ds_id = pathArray.pop()) ) {}
+
+
+			// FIXME: when "this" issue is resolved, these should not be needed as globals
 			var map = new Map();
-			map.init()
-			map.loadNetwork()
-
+			map.init();
 			var nodelink = new NodeLink();
-			nodelink.init()
-			nodelink.loadNetwork()	
-
+			nodelink.init();
 			var matrix = new Matrix();
-			matrix.init()
-			matrix.loadNetwork("{{ ds_id }}")
+			matrix.init();
 
+			// var views = [map, nodelink, matrix];
+			var views = [map, matrix];
 
+			function updateViews(filters) {
+				d3.json("/get/" + ds_id, function(network) {
+					for ( var i=0; i < views.length; i++ ) {
+						views[i].loadNetwork(network);
+					}
+				});
+			}
+
+			updateViews();
 		</script>
 	</body>
 </html>

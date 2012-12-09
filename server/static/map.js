@@ -63,29 +63,26 @@ Map.prototype.init = function() {
 	});
 }
 
-Map.prototype.loadNetwork = function() {
+Map.prototype.loadNetwork = function(network) {
 	var themap = this;
 
-	// TODO: build the URL to get_data here
-	d3.json("/static/collab2008.json", function(network) {
-			map.data = network;
-            var arcs = themap.arc_group.selectAll("path")
-				.data(network.links);
+	map.data = network;
+	var arcs = themap.arc_group.selectAll("path")
+		.data(network.links);
 
-			arcs
-              .enter().append("path")
- 			    .attr("class", "arc")
-            	.attr("d", map.arcpath);
+	arcs
+	  .enter().append("path")
+	    .attr("class", "arc")
+		.attr("d", map.arcpath);
 
-			arcs
-			  .exit()
-			    .remove();
-	        });
+	arcs
+	  .exit()
+	    .remove();
 }
 
 Map.prototype.arcpath = function(d) {
-	var tmp_src = map.country_group.selectAll('[country_code=' + map.data.nodes[d.source].id + ']');
-	var tmp_tgt = map.country_group.selectAll('[country_code=' + map.data.nodes[d.target].id + ']');
+	var tmp_src = map.country_group.selectAll('[country_code=' + map.data.nodes[d.source].country_code + ']');
+	var tmp_tgt = map.country_group.selectAll('[country_code=' + map.data.nodes[d.target].country_code + ']');
 
 	if (tmp_src[0].length && tmp_tgt[0].length ) {
 		var source_country = tmp_src.datum();
