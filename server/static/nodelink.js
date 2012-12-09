@@ -11,9 +11,12 @@ function NodeLink() {
 	this.selector = "#nodelinkview > #nodelink";
 
 	// public properties
-	this.svg = null;
 	this.color = null;
 	this.force = null;
+
+	this.svg = null;
+	this.node_group = null;
+	this.link_group = null;
 }
 
 NodeLink.prototype.redraw = function() {
@@ -25,7 +28,7 @@ NodeLink.prototype.redraw = function() {
 
 NodeLink.prototype.init = function() {
 	this.force = d3.layout.force()
-		.gravity(0.5)
+		.gravity(0.2)
     	.charge(-200)
    		.linkDistance(50)
    		.size([nodelink.w, nodelink.h]);
@@ -42,6 +45,12 @@ NodeLink.prototype.init = function() {
     	.attr('width', nodelink.w)
     	.attr('height', nodelink.h)
     	.attr('fill', 'white');
+
+	this.link_group = this.svg.append("g")
+		.attr('id', 'links');
+
+	this.node_group = this.svg.append("g")
+		.attr('id', 'nodes');
 
 	this.loading = this.svg.append("text")
     .attr("x", nodelink.w / 2)
@@ -69,33 +78,39 @@ NodeLink.prototype.loadNetwork = function(graph) {
 	 for (var i = nodelink.n * nodelink.n; i > 0; --i) nodelink.force.tick();
 	 nodelink.force.stop();
 
-	 var links = nodelink.svg.selectAll("line")
+	 var links = nodelink.link_group.selectAll("line")
   		.data(graph.links, function(d) { return d.id; });
 
 	links
-	   .enter().append("line")
- 		.attr("x1", function(d) { return d.source.x; })
-  		.attr("y1", function(d) { return d.source.y; })
-  		.attr("x2", function(d) { return d.target.x; })
-  		.attr("y2", function(d) { return d.target.y; })
-		.attr("class", "link")
-	    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
+	   .enter().append("line");
 
 	links
 		.exit().remove();
 
-	 var nodes = nodelink.svg.selectAll("circle")
-  		.data(graph.nodes, function(d) { return d.id; });
+	nodelink.link_group.selectAll("line")
+		.attr("x1", function(d) { return d.source.x; })
+		.attr("y1", function(d) { return d.source.y; })
+		.attr("x2", function(d) { return d.target.x; })
+		.attr("y2", function(d) { return d.target.y; })
+		.attr("class", "link")
+	    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
+
+
+	 var nodes = nodelink.node_group.selectAll("circle")
+		.data(graph.nodes, function(d) { return d.id; });
 
 	nodes
-	  .enter().append("circle")
-  		.attr("cx", function(d) { return d.x; })
-  		.attr("cy", function(d) { return d.y; })
-  		.attr("r", nodelink.r - .75)
+	  .enter().append("circle");
+
+	nodes
+		.exit().remove();
+
+	nodes = nodelink.node_group.selectAll("circle")
+		.attr("cx", function(d) { return d.x; })
+		.attr("cy", function(d) { return d.y; })
+		.attr("r", nodelink.r - .75)
 	 	.style("fill", function(d) { return colourscale(d.region); });
 
-	 nodes
-		.exit().remove();
 
 	 nodelink.loading.remove();
 
