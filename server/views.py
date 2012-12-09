@@ -73,8 +73,8 @@ def upload(request):
 def get_ds(request, ds_id):
     G = pickle.load(open("DATASETS/graph%s.pickle" % ds_id, 'r'))
 
+    pp = pprint.PrettyPrinter(stream=sys.stderr)
     if request.GET and 'json' in request.GET:
-        pp = pprint.PrettyPrinter(stream=sys.stderr)
         pp.pprint(json.loads(request.GET['json']))
 
         params = json.loads(request.GET['json'])
