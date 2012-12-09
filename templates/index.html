@@ -1,99 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-			<meta charset="utf-8">
-			<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-		<script src="http://d3js.org/d3.v2.min.js?2.9.6" type="text/javascript">
+<html>
+<head>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script>
 </script>
-		<style type="text/css">
+</head>
 
-		svg {
-		  font: 10px sans-serif;
-		}
+<body>
 
-		.background {
-		fill: none;
-		pointer-events: all;
-		}
-
-		#countries {
-		fill: #aaa;
-		stroke: #fff;
-		stroke-width: 1.5px;
-		}
-
-		#countries .active {
-		fill: steelblue;
-		}
-
-		 #states path {
-		   fill: #ccc;
-		   stroke: #fff;
-		 }
-
-		 path.arc {
-		   pointer-events: none;
-		   fill: none;
-		   stroke: steelblue;
-		   stroke-opacity: 0.2;
-		 }
-
-		 #matrixview {
-			 float: left;
-		 }
-		 
-		 #mapview {
-			 float:left;
-		 }
-		</style>
-		<title></title>
-	</head>
-	<body>
-		<div class="container">
-
-		<h2>GeoNetViz</h2>
-
-		<div class="tabbable">  
-		<ul class="nav nav-tabs">  
-		<li class="active"><a href="#mapview" data-toggle="tab">Map View</a></li>  
-		<li class=""><a href="#nodelinkview" data-toggle="tab">Node-Link View</a></li>  
-		<li class=""><a href="#matrixview" data-toggle="tab">Matrix View</a></li>  
-		</ul>  
-		<div class="tab-content">  
-			<div class="tab-pane active" id="mapview">  
-				<div id="map"> </div>
-			</div>  
-			<div class="tab-pane" id="nodelinkview">  
-				<div id="nodelink"> </div> 
-			</div>  
-			<div class="tab-pane" id="matrixview">  
-				<div id="matrix"> </div> 
-			</div>  
-    	</div>  
-
-    	</div>
-
-		<script src="http://code.jquery.com/jquery-latest.js"></script>
-		<script src="/static/bootstrap/js/bootstrap.min.js"></script>
-
-		<script src="/static/map.js" type="text/javascript"></script>	
-		<script src="/static/nodelink.js" type="text/javascript"></script>				
-		<script src="/static/matrix.js" type="text/javascript"></script>										
-
-		<script type="text/javascript">
-			var map = new Map();
-			map.init()
-			map.loadNetwork()
-
-			var nodelink = new NodeLink();
-			nodelink.init()
-			nodelink.loadNetwork()	
-
-			var matrix = new Matrix();
-			matrix.init()
-			matrix.loadNetwork()
-
-
-		</script>
-	</body>
+Submit a file to visualize.<br>
+<br>
+<form action="/upload/" method="POST" enctype="multipart/form-data" id="uploadform">
+<input type="file" name="ds" id="ds" enctype="multipart/form-data">
+<br>
+<input type="submit" value="Submit">
+</body>
 </html>
