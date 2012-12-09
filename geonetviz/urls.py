@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     # url(r'^admin/', include(admin.site.urls)),
 
     url(r'^upload/', 'server.views.upload'),
-    url(r'^get/(?P<ds_id>.*)/?$', 'server.views.get_ds'),
+    url(r'^get/(?P<ds_id>[0-9\.]+)/?$', 'server.views.get_ds'),
     url(r'^/?$', 'server.views.index'),
+    url(r'^view/(?P<ds_id>[0-9\.]*)/?$', 'server.views.view_ds'),
 )

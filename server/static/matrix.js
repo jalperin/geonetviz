@@ -57,12 +57,11 @@ Matrix.prototype.row = function(row) {
 // 	      .on("mouseout", mouseout);
 }
 
-Matrix.prototype.loadNetwork = function() {
+Matrix.prototype.loadNetwork = function(ds_id) {
 	var thematrix = this;
 
 	// TODO: build the URL to get_data here
-	d3.json("/static/collab2008.json", function(network) {
-
+	d3.json("/static/collab2008.json", function(network) { ## TODO /get/ds_id/
 		// set the domain to each node id
 		thematrix.x.domain(d3.keys(network.nodes));
 
