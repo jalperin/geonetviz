@@ -14,6 +14,7 @@ function Matrix() {
 	this.z = null;
 	this.c = null;
 	this.matrix = [];
+	this.data = null;
 }
 
 
@@ -58,63 +59,63 @@ Matrix.prototype.row = function(row) {
 }
 
 Matrix.prototype.loadNetwork = function(network) {
-	var thematrix = this;
+	this.data = network;
 
-	// set the domain to each node id
-	thematrix.x.domain(d3.keys(network.nodes));
+	// order (also sets the domain)
+	matrix.order('name');
 
 	network.nodes.forEach(function(node, i) {
-		thematrix.matrix[i] = d3.range(network.nodes.length).map(function(j) { return {x: j, y: i, z: 0}; });
+		matrix.matrix[i] = d3.range(network.nodes.length).map(function(j) { return {x: j, y: i, z: 0}; });
 	});
 
 	// Convert links to matrix; include link weight
 	network.links.forEach(function(link) {
-		thematrix.matrix[link.source][link.target].z += link.weight;
-		thematrix.matrix[link.target][link.source].z += link.weight;
+		matrix.matrix[link.source][link.target].z += link.weight;
+		matrix.matrix[link.target][link.source].z += link.weight;
 		// nodes[link.source].count += link.weight;
 		// nodes[link.target].count += link.weight;
 	});
 
-	var rowSelection = thematrix.svg.selectAll(".row")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: thematrix.matrix[i]}; }))
+	var rowSelection = matrix.svg.selectAll(".row")
+		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: matrix.matrix[i]}; }))
  	  .exit()
 		.remove();
 
-	var columnSelection = thematrix.svg.selectAll(".column")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: thematrix.matrix[i]}; }))
+	var columnSelection = matrix.svg.selectAll(".column")
+		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: matrix.matrix[i]}; }))
  	  .exit()
 		.remove();
 
 	// add in rows that are needed
-	// NOTE: this implementation does not allow for client-side filtering
+	// FIXME: this implementation screws up filtering
 	// it depends on the node indexes for the position of the cells
 	// any deletions will caude indexes to not align with right row
-	rowSelection = thematrix.svg.selectAll(".row")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, region: node.region, links: thematrix.matrix[i]}; }))
+	rowSelection = matrix.svg.selectAll(".row")
+		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, region: node.region, links: matrix.matrix[i]}; }))
 	  .enter().append("g")
 		.attr("class", "row")
-		.attr("transform", function(d, i) { return "translate(0," + thematrix.x(i) + ")"; });
+		.attr("transform", function(d, i) { return "translate(0," + matrix.x(i) + ")"; });
 
 	// remove columns that are not part of the filter
-	columnSelection = thematrix.svg.selectAll(".column")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, region: node.region, links: thematrix.matrix[i]}; }))
+	columnSelection = matrix.svg.selectAll(".column")
+		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, region: node.region, links: matrix.matrix[i]}; }))
 	  .enter().append("g")
 		.attr("class", "column")
-		.attr("transform", function(d, i) { return "translate(" + thematrix.x(i) + ")rotate(-90)"; });
+		.attr("transform", function(d, i) { return "translate(" + matrix.x(i) + ")rotate(-90)"; });
 
 	// add in the cells, for new rows and for existing rows
-	rowSelection = thematrix.svg.selectAll(".row")
-			.each(thematrix.row);
+	rowSelection = matrix.svg.selectAll(".row")
+			.each(matrix.row);
 
 	rowSelection.append("line")
-		.attr("x2", thematrix.width);
+		.attr("x2", matrix.width);
 
 	columnSelection.append("line")
-		.attr("x1", -thematrix.width);
+		.attr("x1", -matrix.width);
 
 	rowSelection.append("text")
 		.attr("x", 10)
-		.attr("y", thematrix.x.rangeBand() / 4)
+		.attr("y", matrix.x.rangeBand() / 4)
 		.attr("dy", ".01em")
 		.attr("text-anchor", "end")
 		.attr("fill", function(d) { return colourscale(d.region) })
@@ -122,9 +123,45 @@ Matrix.prototype.loadNetwork = function(network) {
 
 	columnSelection.append("text")
 		.attr("x", 6)
-		.attr("y", thematrix.x.rangeBand() / 4)
+		.attr("y", matrix.x.rangeBand() / 4)
 		.attr("dy", ".01em")
 		.attr("text-anchor", "start")
 		.attr("fill", function(d) { return colourscale(d.region) })
 		.text(function(d) { return d.id });
+
+    // Now move everything to where it goes
+    var t = matrix.svg.transition().duration(2500);
+
+    t.selectAll(".row")
+        .delay(function(d, i) { return i * 4; })
+        .attr("transform", function(d, i) { return "translate(0," + matrix.x(d.index) + ")"; });
+
+    t.selectAll(".column")
+        .delay(function(d, i) { return i * 4; })
+        .attr("transform", function(d, i) { return "translate(" + matrix.x(d.index) + ")rotate(-90)"; });
+
+     t.selectAll(".cell")
+        .delay(function(d, i) { return d.y * 4; })
+        .attr("x", function(d) { return matrix.x(d.x); })
+        .attr("width", matrix.x.rangeBand())
+        .attr("height", matrix.x.rangeBand());
 }
+
+Matrix.prototype.order = function(order) {
+    // Precompute the orders.
+	var orders = {
+		name: matrix.data.nodes.sort(function(a, b) { return d3.ascending(a.country_code, b.country_code); }),
+		weight: matrix.data.nodes.sort(function(a, b) { return d3.ascending(a.weight, b.weight); }),
+		region: matrix.data.nodes.sort(function(a, b) { return d3.ascending(a.region, b.region); })
+	};
+
+	// set the domain to each node id
+	// FIXME: using the keys here is a mistake
+	// see comment on row/columnSelection.data() calls above
+	matrix.x.domain(d3.keys(orders[order]));
+}
+
+// bind the to the order selector
+d3.select("#order").on("change", function() {
+	matrix.order(this.value);
+});
