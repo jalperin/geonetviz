@@ -1,7 +1,7 @@
 function Map() {
 	// parameters
-	this.width = 400;
-	this.height = 350;
+	this.width = 600;
+	this.height = 500;
 	this.selector = "#mapview > #map";
 
 	// public properties
@@ -12,6 +12,9 @@ function Map() {
 	this.g = null;
 	this.country_group = null;
 	this.arc_group = null;
+
+	// the network
+	this.network = null;
 }
 
 Map.prototype.init = function() {
@@ -47,8 +50,7 @@ Map.prototype.init = function() {
 		.call(this.zoom);
 
 	this.arc_group = this.g.append("g")
-	    .attr("id", "arcs")
-		.call(this.zoom);
+	    .attr("id", "arcs");
 
 	// load the base map
 	d3.json("/static/world-countries.json", function(countries) {
@@ -66,25 +68,14 @@ Map.prototype.loadNetwork = function() {
 
 	// TODO: build the URL to get_data here
 	d3.json("/static/collab2008.json", function(network) {
-		// Question: I wanted to use "this.arc_group", but
-		// I don't understand JS' "this" keyword. help!
+			map.data = network;
             var arcs = themap.arc_group.selectAll("path")
 				.data(network.links);
 
 			arcs
               .enter().append("path")
  			    .attr("class", "arc")
-            	.attr("d", function(d) {
-					var tmp_src = themap.country_group.selectAll('[country_code=' + network.nodes[d.source].id + ']');
-					var tmp_tgt = themap.country_group.selectAll('[country_code=' + network.nodes[d.target].id + ']');
-
-					if (tmp_src[0].length && tmp_tgt[0].length ) {
-						var source_country = tmp_src.datum();
-						var target_country = tmp_tgt.datum();
-						var line = d3.svg.line();
-						return line([themap.path.centroid(source_country), themap.path.centroid(target_country)]);
-					}
-	              });
+            	.attr("d", map.arcpath);
 
 			arcs
 			  .exit()
@@ -92,11 +83,24 @@ Map.prototype.loadNetwork = function() {
 	        });
 }
 
+Map.prototype.arcpath = function(d) {
+	var tmp_src = map.country_group.selectAll('[country_code=' + map.data.nodes[d.source].id + ']');
+	var tmp_tgt = map.country_group.selectAll('[country_code=' + map.data.nodes[d.target].id + ']');
+
+	if (tmp_src[0].length && tmp_tgt[0].length ) {
+		var source_country = tmp_src.datum();
+		var target_country = tmp_tgt.datum();
+		var line = d3.svg.line();
+		return line([map.path.centroid(source_country), map.path.centroid(target_country)]);
+	}
+}
+
+
 Map.prototype.zoommove = function () {
 	// FIXME: how to get reference to map instance in a non-global way?
     map.projection.translate(d3.event.translate).scale(d3.event.scale);
     map.country_group.selectAll("path").attr("d", map.path);
-	map.arc_group.selectAll("path").attr("d", map.path);
+	map.arc_group.selectAll("path").attr("d", map.arcpath);
 }
 
 Map.prototype.click = function (d) {
