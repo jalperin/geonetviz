@@ -50,10 +50,18 @@ def upload_file(request):
             idx += 1
         for link in json_ds['links']:
             G.add_edge(link['source'], link['target'], weight=link['weight'])
-        f = open("DATASETS/graph%s.pickle" % ds_id, 'w')
-        pickle.dump(G, f)
     else:
         return "ERROR_UNKNOWN_FORMAT"
+
+    ctor = pickle.load(open('DATASETS/country_to_continent.pkl', 'r'))
+    for idx in range(len(G.node)):
+        if 'country_code' in G.node[idx] and G.node[idx]['country_code'] in ctor:
+            G.node[idx]['region'] = ctor[G.node[idx]['country_code']]
+        else:
+            G.node[idx]['region'] = 'Unknown'
+
+    f = open("DATASETS/graph%s.pickle" % ds_id, 'w')
+    pickle.dump(G, f)
 
     return ds_id
 
