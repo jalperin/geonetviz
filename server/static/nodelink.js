@@ -66,7 +66,7 @@ NodeLink.prototype.loadNetwork = function(graph) {
 
 	 nodelink.svg.selectAll("line")
   		.data(graph.links)
-	 	.enter().append("line")
+	   .enter().append("line")
  		.attr("x1", function(d) { return d.source.x; })
   		.attr("y1", function(d) { return d.source.y; })
   		.attr("x2", function(d) { return d.target.x; })
@@ -74,13 +74,21 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		.attr("class", "link")
 	    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
 
+	nodelink.svg.selectAll("line")
+  		.data(graph.links)
+		.exit().remove();
+
 	 nodelink.svg.selectAll("circle")
   		.data(graph.nodes)
-		.enter().append("circle")
+	  .enter().append("circle")
   		.attr("cx", function(d) { return d.x; })
   		.attr("cy", function(d) { return d.y; })
   		.attr("r", nodelink.r - .75)
 	 	.style("fill", function(d) { return colourscale(d.region); });
+
+	 nodelink.svg.selectAll("circle")
+  		.data(graph.nodes)
+		.exit().remove();
 
 	 nodelink.loading.remove();
 
