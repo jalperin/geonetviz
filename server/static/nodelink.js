@@ -56,6 +56,11 @@ NodeLink.prototype.init = function() {
 NodeLink.prototype.loadNetwork = function(graph) {
 	 setTimeout(function() {
 
+	 // set the id's of the links to something we can refer to
+	 for (i=0; i<graph.links.length; i++) {
+		 graph.links[i].id = graph.links[i].source + "-" + graph.links[i].target;
+	 }
+
 	 nodelink.force
 	     .nodes(graph.nodes)
 		 .links(graph.links)
@@ -64,8 +69,10 @@ NodeLink.prototype.loadNetwork = function(graph) {
 	 for (var i = nodelink.n * nodelink.n; i > 0; --i) nodelink.force.tick();
 	 nodelink.force.stop();
 
-	 nodelink.svg.selectAll("line")
-  		.data(graph.links)
+	 var links = nodelink.svg.selectAll("line")
+  		.data(graph.links, function(d) { return d.id; });
+
+	links
 	   .enter().append("line")
  		.attr("x1", function(d) { return d.source.x; })
   		.attr("y1", function(d) { return d.source.y; })
@@ -74,20 +81,20 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		.attr("class", "link")
 	    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
 
-	nodelink.svg.selectAll("line")
-  		.data(graph.links)
+	links
 		.exit().remove();
 
-	 nodelink.svg.selectAll("circle")
-  		.data(graph.nodes)
+	 var nodes = nodelink.svg.selectAll("circle")
+  		.data(graph.nodes, function(d) { return d.id; });
+
+	nodes
 	  .enter().append("circle")
   		.attr("cx", function(d) { return d.x; })
   		.attr("cy", function(d) { return d.y; })
   		.attr("r", nodelink.r - .75)
 	 	.style("fill", function(d) { return colourscale(d.region); });
 
-	 nodelink.svg.selectAll("circle")
-  		.data(graph.nodes)
+	 nodes
 		.exit().remove();
 
 	 nodelink.loading.remove();
