@@ -109,6 +109,21 @@ Map.prototype.zoommove = function () {
 }
 
 Map.prototype.mouseover = function (p) {
+	// FIXME: this not elevant at all
+	node = null;
+	for (var i=0; i < map.data.nodes.length; i++) {
+		if (map.data.nodes[i].country_code == p.id) {
+			node = map.data.nodes[i];
+			break;
+		}
+	}
+
+	content = '<p>' + node.country_name + '</span></p>';
+	content += '<hr class="tooltip-hr">';
+	content += '<p>' + node.region + '</span></p>';
+	nodelink.tooltip.showTooltip(content,d3.event);
+
+
 	map.arc_group.selectAll("path")
 		.attr("opacity",
 			function(d) {

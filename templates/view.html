@@ -4,7 +4,7 @@
 			<meta charset="utf-8">
 			<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 			<link href="/static/style.css" rel="stylesheet" media="screen">
-			
+
 		<script src="http://d3js.org/d3.v2.min.js?2.9.6" type="text/javascript">
 </script>
 <script type="text/javascript">
@@ -33,20 +33,16 @@
 		stroke-width: 1.5px;
 		}
 
-		#countries .active {
-		fill: steelblue;
-		}
-
 		 #states path {
 		   fill: #ccc;
 		   stroke: #fff;
 		 }
 
-		 path.arc {
+		 .arc {
 		   pointer-events: none;
 		   fill: none;
-		   stroke: steelblue;
-		   stroke-opacity: 0.2;
+		   stroke: #999;
+		   stroke-opacity: 0.4;
 		 }
 
 		 #matrixview {
@@ -55,7 +51,8 @@
 
 		 #mapview {
 			 float:left;
-	 }
+	   	}
+
 		.node {
 		  stroke: #fff;
 		  stroke-width: 1.5px;
@@ -70,11 +67,11 @@
 		<title></title>
 	</head>
 	<body>
-			
-	
+
+
 			<div class="container">
 
-		
+
 
 		<p>.</p>
 		<div class="inline">
@@ -94,7 +91,7 @@
                         <li><a href="#" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22South+America%22%5D%7D%7D')" id="AfricaSouthAmerica">Africa and South America</a></li>
                         <li><a href="#"  onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D')"  id="eidechse">Africa and North America</a></li>
                         <li><a href="#"  onclick="updateViews(ds_id)" id="iguana">All</a></li>
-                  </ul>	
+                  </ul>
 			</li>
     		</ul>
 
@@ -154,10 +151,10 @@
 			updateViews(ds_id);
 	</script>
 
-	<script>  
-$(function ()  
-{ $("#about-views").popover({placement:'bottom'});  
-});  
-</script> 
+	<script>
+$(function ()
+{ $("#about-views").popover({placement:'bottom'});
+});
+</script>
 	</body>
 </html>
