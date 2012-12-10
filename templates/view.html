@@ -74,12 +74,12 @@
 	
 			<div class="container">
 
-					<p class="pull-right" style:"margin-right:20px;"><a href="#">About Views</a></p>
+		
 
+		<p>.</p>
 		<div class="inline">
   			<h1 style="margin-top:30px;">GeoNetViz</h1>
-			<p>   </p>
-
+				<p class="pull-right"><a href="#" id="about-views" rel="tooltip" data-content="The purpose of this tool is to allow a user to view a network in different ways, revealing new features of the data through each view. The map view highlights the geographical nature of the data. The node-link view ignores geography (aside from the color of the nodes by region and the tooltips), but shows how the locations cluster according to the ties between them. The matrix view enables sorting and provides yet another perspective on how the network is structured." data-original-title="What is GeoNetViz?">About Views</a></p>
 		</div>
 
 		<p style="margin-top:20px; margin-bottom:20px;">Explore your network data using three different views. Zoom. Drag. Hover. Filter. What do you see?</p>
@@ -121,7 +121,6 @@
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
 		<script src="/static/bootstrap/js/bootstrap.min.js"></script>
 		<script src="/static/Tooltip.js"></script>
-		<script src="/twitter-bootstrap/twitter-bootstrap-v2/js/bootstrap-popover.js"></script> 
 
 
 		<script src="/static/map.js" type="text/javascript"></script>
@@ -153,6 +152,12 @@
 
 			// updateViews(ds_id, "json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D");
 			updateViews(ds_id);
-		</script>
+	</script>
+
+	<script>  
+$(function ()  
+{ $("#about-views").popover({placement:'bottom'});  
+});  
+</script> 
 	</body>
 </html>
