@@ -116,14 +116,21 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		.attr("r", nodelink.r - .75)
 	 	.style("fill", function(d) { return colourscale(d.region); });
 
-	nodes.on("mouseover", function(d) {
-		content = '<p>' + d.country_name + '</span></p>';
+	nodes.on("mouseover", function(p) {
+		content = '<p>' + p.country_name + '</span></p>';
    		content += '<hr class="tooltip-hr">';
-    	content += '<p>' + d.region + '</span></p>';
+    	content += '<p>' + p.region + '</span></p>';
    		nodelink.tooltip.showTooltip(content,d3.event);	
 
-		
-		d3.select(this).style("stroke","black")
+		links.selectAll("line")
+			.attr("stroke",
+				function(d) { if  (d.source == p ) {
+								return '#555';
+					} else { return '#ddd'; }
+				}) ;
+
+	
+ 		d3.select(this).style("stroke","black")
       	.style("stroke-width", 2.0); 
 		
 	});

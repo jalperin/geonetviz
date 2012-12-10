@@ -3,7 +3,7 @@
 	<head>
 			<meta charset="utf-8">
 			<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-			<link href="/static/tooltip_style.css" rel="stylesheet" media="screen">
+			<link href="/static/style.css" rel="stylesheet" media="screen">
 			
 		<script src="http://d3js.org/d3.v2.min.js?2.9.6" type="text/javascript">
 </script>
@@ -70,19 +70,34 @@
 		<title></title>
 	</head>
 	<body>
-		<div class="container">
+			
+	
+			<div class="container">
 
-		<h2>GeoNetViz</h2>
-		<input type="button" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22South+America%22%5D%7D%7D')" value="Africa and South America" />
-		<input type="button" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D')" value="Africa and North America" />
-		<input type="button" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22NONE%22%2C%22NONEOTHER%22%5D%7D%7D')" value="None" />
-		<input type="button" onclick="updateViews(ds_id)" value="All" />
+					<p class="pull-right" style:"margin-right:20px;"><a href="#">About Views</a></p>
+
+		<div class="inline">
+  			<h1 style="margin-top:30px;">GeoNetViz</h1>
+			<p>   </p>
+
+		</div>
+
+		<p style="margin-top:20px; margin-bottom:20px;">Explore your network data using three different views. Zoom. Drag. Hover. Filter. What do you see?</p>
 		<div class="tabbable">
+
 		<ul class="nav nav-tabs">
 		<li class="active"><a href="#mapview" data-toggle="tab">Map View</a></li>
 		<li class=""><a href="#nodelinkview" data-toggle="tab">Node-Link View</a></li>
 		<li class=""><a href="#matrixview" data-toggle="tab">Matrix View</a></li>
-		</ul>
+		<li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> Filters<b class="caret"></b></a>
+				 <ul class="dropdown-menu">
+                        <li><a href="#" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22South+America%22%5D%7D%7D')" id="AfricaSouthAmerica">Africa and South America</a></li>
+                        <li><a href="#"  onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D')"  id="eidechse">Africa and North America</a></li>
+                        <li><a href="#"  onclick="updateViews(ds_id)" id="iguana">All</a></li>
+                  </ul>	
+			</li>
+    		</ul>
+
 		<div class="tab-content">
 			<div class="tab-pane active" id="mapview">
 				<div id="map"> </div>
@@ -106,6 +121,7 @@
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
 		<script src="/static/bootstrap/js/bootstrap.min.js"></script>
 		<script src="/static/Tooltip.js"></script>
+		<script src="/twitter-bootstrap/twitter-bootstrap-v2/js/bootstrap-popover.js"></script> 
 
 
 		<script src="/static/map.js" type="text/javascript"></script>
