@@ -4,8 +4,8 @@
 function Matrix() {
 	// parameters
 	this.margin = {top: 20, right: 10, bottom: 10, left: 20};
-	this.width = 1000;
-	this.height = 1000;
+	this.width = 800;
+	this.height = 800;
 	this.selector = "#matrixview > #matrix";
 
 	// public properties
@@ -15,6 +15,7 @@ function Matrix() {
 	this.c = null;
 	this.matrix = [];
 	this.data = null;
+	this.selected_order = 'name';
 }
 
 
@@ -47,7 +48,7 @@ Matrix.prototype.row = function(row) {
 
 	cell
 	      .attr("class", "cell")
-	      .attr("x", function(d, i) { return matrix.x(i); })
+	      .attr("x", function(d) { return matrix.x(d.t); })
 	      .attr("width", matrix.x.rangeBand())
 	      .attr("height", matrix.x.rangeBand())
 	      .style("fill-opacity", function(d) { return matrix.z(d.z); })
@@ -59,30 +60,38 @@ Matrix.prototype.row = function(row) {
 }
 
 Matrix.prototype.loadNetwork = function(network) {
+	// set for easy access by other methods
 	this.data = network;
 
-	// order (also sets the domain)
-	matrix.order('name');
+	matrix.order(this.selected_order);
 
-	network.nodes.forEach(function(node, i) {
-		matrix.matrix[i] = d3.range(network.nodes.length).map(function(j) { return {x: j, y: i, z: 0}; });
+	network.nodes.forEach(function(node) {
+		// if you can figure out what this next line is doing, you get a prize!
+		matrix.matrix[node.id] = [];
 	});
 
 	// Convert links to matrix; include link weight
 	network.links.forEach(function(link) {
-		matrix.matrix[link.source][link.target].z += link.weight;
-		matrix.matrix[link.target][link.source].z += link.weight;
-		// nodes[link.source].count += link.weight;
-		// nodes[link.target].count += link.weight;
+		src_node_id = network.nodes[link.source].id;
+		tgt_node_id = network.nodes[link.target].id;
+		matrix.matrix[src_node_id].push({s: src_node_id, t: tgt_node_id, z: link.weight});
+		matrix.matrix[tgt_node_id].push({s: tgt_node_id, t: src_node_id, z: link.weight});
 	});
 
+	// FIXME: need to copy over all the properties present in the nodes
+	data_to_bind = network.nodes.map(function(node) { return {id: node.id, country_code: node.country_code, region: node.region, links: matrix.matrix[node.id]}; });
+
 	var rowSelection = matrix.svg.selectAll(".row")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: matrix.matrix[i]}; }))
+		.data(data_to_bind, get_node_id);
+
+	rowSelection
  	  .exit()
 		.remove();
 
 	var columnSelection = matrix.svg.selectAll(".column")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, links: matrix.matrix[i]}; }))
+		.data(data_to_bind, get_node_id);
+
+	columnSelection
  	  .exit()
 		.remove();
 
@@ -90,59 +99,59 @@ Matrix.prototype.loadNetwork = function(network) {
 	// FIXME: this implementation screws up filtering
 	// it depends on the node indexes for the position of the cells
 	// any deletions will caude indexes to not align with right row
-	rowSelection = matrix.svg.selectAll(".row")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, region: node.region, links: matrix.matrix[i]}; }))
+	rowSelection
 	  .enter().append("g")
 		.attr("class", "row")
-		.attr("transform", function(d, i) { return "translate(0," + matrix.x(i) + ")"; });
+		.attr("transform", function(d) { return "translate(0," + matrix.x(d.id) + ")"; })
+		.append("text")
+			.attr("x", 10)
+			.attr("y", matrix.x.rangeBand() / 4)
+			.attr("dy", ".01em")
+			.attr("text-anchor", "end")
+			.attr("fill", function(d) { return colourscale(d.region) })
+			.text(function(d) { return d.country_code });
 
 	// remove columns that are not part of the filter
-	columnSelection = matrix.svg.selectAll(".column")
-		.data(network.nodes.map(function(node, i) { return {index: i, id: node.country_code, region: node.region, links: matrix.matrix[i]}; }))
+	columnSelection
 	  .enter().append("g")
 		.attr("class", "column")
-		.attr("transform", function(d, i) { return "translate(" + matrix.x(i) + ")rotate(-90)"; });
+		.attr("transform", function(d) { return "translate(" + matrix.x(d.id) + ")rotate(-90)"; })
+		.append("text")
+			.attr("x", 6)
+			.attr("y", matrix.x.rangeBand() / 4)
+			.attr("dy", ".01em")
+			.attr("text-anchor", "start")
+			.attr("fill", function(d) { return colourscale(d.region) })
+			.text(function(d) { return d.country_code });
+
 
 	// add in the cells, for new rows and for existing rows
 	rowSelection = matrix.svg.selectAll(".row")
 			.each(matrix.row);
 
-	rowSelection.append("line")
-		.attr("x2", matrix.width);
-
-	columnSelection.append("line")
-		.attr("x1", -matrix.width);
-
-	rowSelection.append("text")
-		.attr("x", 10)
-		.attr("y", matrix.x.rangeBand() / 4)
-		.attr("dy", ".01em")
-		.attr("text-anchor", "end")
-		.attr("fill", function(d) { return colourscale(d.region) })
-		.text(function(d) { return d.id });
-
-	columnSelection.append("text")
-		.attr("x", 6)
-		.attr("y", matrix.x.rangeBand() / 4)
-		.attr("dy", ".01em")
-		.attr("text-anchor", "start")
-		.attr("fill", function(d) { return colourscale(d.region) })
-		.text(function(d) { return d.id });
+	// rowSelection
+	//   .enter().append("line")
+	// 	.attr("x2", matrix.width);
+	//
+	// columnSelection
+	//   .enter().append("line")
+	// 	.attr("x1", -matrix.width);
+	//
 
     // Now move everything to where it goes
-    var t = matrix.svg.transition().duration(2500);
+    var t = matrix.svg.transition().duration(1000);
 
     t.selectAll(".row")
         .delay(function(d, i) { return i * 4; })
-        .attr("transform", function(d, i) { return "translate(0," + matrix.x(d.index) + ")"; });
+        .attr("transform", function(d) { return "translate(0," + matrix.x(d.id) + ")"; });
 
     t.selectAll(".column")
         .delay(function(d, i) { return i * 4; })
-        .attr("transform", function(d, i) { return "translate(" + matrix.x(d.index) + ")rotate(-90)"; });
+        .attr("transform", function(d) { return "translate(" + matrix.x(d.id) + ")rotate(-90)"; });
 
      t.selectAll(".cell")
-        .delay(function(d, i) { return d.y * 4; })
-        .attr("x", function(d) { return matrix.x(d.x); })
+        .delay(function(d, i) { return i * 4; })
+        .attr("x", function(d) { return matrix.x(d.t); })
         .attr("width", matrix.x.rangeBand())
         .attr("height", matrix.x.rangeBand());
 }
@@ -150,18 +159,39 @@ Matrix.prototype.loadNetwork = function(network) {
 Matrix.prototype.order = function(order) {
     // Precompute the orders.
 	var orders = {
-		name: matrix.data.nodes.sort(function(a, b) { return d3.ascending(a.country_code, b.country_code); }),
-		weight: matrix.data.nodes.sort(function(a, b) { return d3.ascending(a.weight, b.weight); }),
-		region: matrix.data.nodes.sort(function(a, b) { return d3.ascending(a.region, b.region); })
+		name: matrix.data.nodes.sort(function(a, b) { return d3.ascending(a.country_code, b.country_code); }).map(get_node_id),
+		weight: matrix.data.nodes.sort(function(a, b) { return d3.descending(a.weight, b.weight); }).map(get_node_id),
+		region: matrix.data.nodes.sort(function(a, b) { return d3.ascending(a.region, b.region); }).map(get_node_id)
 	};
 
 	// set the domain to each node id
 	// FIXME: using the keys here is a mistake
 	// see comment on row/columnSelection.data() calls above
-	matrix.x.domain(d3.keys(orders[order]));
+	matrix.x.domain(orders[order]);
+
+    var t = matrix.svg.transition().duration(1000);
+
+    t.selectAll(".row")
+        .delay(function(d, i) { return i * 4; })
+        .attr("transform", function(d) { return "translate(0," + matrix.x(d.id) + ")"; });
+
+    t.selectAll(".column")
+        .delay(function(d, i) { return i * 4; })
+        .attr("transform", function(d) { return "translate(" + matrix.x(d.id) + ")rotate(-90)"; });
+
+     t.selectAll(".cell")
+        .delay(function(d, i) { return i * 4; })
+        .attr("x", function(d) { return matrix.x(d.t); })
+        .attr("width", matrix.x.rangeBand())
+        .attr("height", matrix.x.rangeBand());
+}
+
+function get_node_id(node){
+	return node.id;
 }
 
 // bind the to the order selector
 d3.select("#order").on("change", function() {
 	matrix.order(this.value);
+	matrix.selected_order = this.value;
 });
