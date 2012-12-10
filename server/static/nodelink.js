@@ -119,7 +119,7 @@ NodeLink.prototype.loadNetwork = function(graph) {
 	 	.style("fill", function(d) { return colourscale(d.region); });
 
 	nodes.on("mouseover", function(p) {
-		content = '<p>' + p.country_code + ', ' + p.region + '</span></p>';
+		content = '<p>' + p.country_name + ', ' + p.region + '</span></p>';
    		content += '<hr class="tooltip-hr">';
     	content += '<p>' + p.degree + ' links' + '; ' + Math.round(p.average_neighbor_degree) + ' avg neighbor links' + '</span></p>';
    		nodelink.tooltip.showTooltip(content,d3.event);
