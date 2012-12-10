@@ -57,7 +57,7 @@ Stats.prototype.loadNetwork = function(network) {
         .orient("left");
         //.tickFormat(formatPercent);
 
-    var svg = d3.select(this.selector).append("svg")
+    this.svg = d3.select(this.selector).append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
@@ -66,12 +66,12 @@ Stats.prototype.loadNetwork = function(network) {
   x.domain(data.map(function(d) { return d.x; }));
   y.domain([0, d3.max(data, function(d) { return d.y; })]);
 
-  svg.append("g")
+  this.svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
-  svg.append("g")
+  this.svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
@@ -81,7 +81,7 @@ Stats.prototype.loadNetwork = function(network) {
       .style("text-anchor", "end")
       .text("Frequency");
 
-  svg.selectAll(".bar")
+  this.svg.selectAll(".bar")
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
