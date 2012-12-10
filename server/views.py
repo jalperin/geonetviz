@@ -5,6 +5,7 @@ import json, sys, pprint
 import cPickle as pickle
 import datetime, random
 from django.shortcuts import redirect
+from collections import Counter
 
 import networkx as nx
 from networkx.readwrite import json_graph
@@ -92,8 +93,6 @@ def get_ds(request, ds_id):
 
     pp = pprint.PrettyPrinter(stream=sys.stderr)
     if request.GET and 'json' in request.GET:
-        pp.pprint(json.loads(request.GET['json']))
-
         params = json.loads(request.GET['json'])
 
         for filter in params['filters']:
@@ -102,6 +101,41 @@ def get_ds(request, ds_id):
                     filter in attrdict and attrdict[filter] in params['filters'][filter]])
             G=SG
 
-    pp.pprint(G.nodes(data=True))
-    pp.pprint(G.edges(data=True))
-    return HttpResponse(json.dumps(json_graph.node_link_data(G)), mimetype="application/json")
+    #pp.pprint(G.nodes(data=True))
+    #pp.pprint(G.edges(data=True))
+
+    deg_dist = get_deg_dist(G)
+    pp.pprint(deg_dist)
+
+    json_data = json_graph.node_link_data(G)
+    json_data['extra_graphs'] = [
+        {
+            'title': 'A Test of Tests!',
+            'type': 'bar',
+            'scale': 'linear',
+            'data': deg_dist,
+        }
+    ]
+
+    return HttpResponse(json.dumps(json_data), mimetype="application/json")
+
+def get_deg_dist(G):
+    deg_dist = Counter()
+    max_deg = 0
+    for idx in range(len(G.node)):
+        deg = G.degree(idx)
+        print >>sys.stderr, deg
+        if deg not in deg_dist:
+            deg_dist[deg] = 0
+        deg_dist[deg] += 1
+        if deg>max_deg:
+            max_deg=deg
+
+    r = []
+    for d in range(max_deg+1):
+        r.append(
+            {'x': d,
+             'y': deg_dist[d]
+            })
+
+    return r
