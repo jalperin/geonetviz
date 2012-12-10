@@ -107,6 +107,7 @@
 		<script src="/static/bootstrap/js/bootstrap.min.js"></script>
 		<script src="/static/Tooltip.js"></script>
 
+
 		<script src="/static/map.js" type="text/javascript"></script>
 		<script src="/static/nodelink.js" type="text/javascript"></script>
 		<script src="/static/matrix.js" type="text/javascript"></script>
@@ -128,7 +129,8 @@
 			function updateViews(ds_id, filters) {
 				d3.json("/get/" + ds_id + "/?" + filters, function(network) {
 					for ( var i=0; i < views.length; i++ ) {
-						views[i].loadNetwork(network);
+						var networkClone = jQuery.extend(true, {}, network);
+						views[i].loadNetwork(networkClone);
 					}
 				});
 			}
