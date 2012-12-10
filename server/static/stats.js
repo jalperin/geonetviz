@@ -1,6 +1,6 @@
 function Stats() {
 	// parameters
-	this.margin = {top: 40, right: 10, bottom: 25, left: 40};
+	this.margin = {top: 40, right: 10, bottom: 25, left: 60};
 	this.width = 750; // width of each chart.
 	this.height = 200; // height of each chart.
 	this.selector = "#statsview > #stats";
@@ -35,8 +35,10 @@ Stats.prototype.loadNetwork = function(network) {
 
     //var formatPercent = d3.format(".0%");
 
+    var xdomain = data.map(function(d) { return d.x; });
     var x = d3.scale.ordinal()
-        .rangeRoundBands([0, width], .2);
+        .domain(xdomain)
+        .rangeBands([0, width], .2);
 
     var y = d3.scale.linear()
         .range([height, 0]);
@@ -61,12 +63,6 @@ Stats.prototype.loadNetwork = function(network) {
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-/*d3.tsv("/static/data.tsv", function(data, error) {
-
-  data.forEach(function(d) {
-    d.frequency = +d.frequency;
-  });*/
-
   x.domain(data.map(function(d) { return d.x; }));
   y.domain([0, d3.max(data, function(d) { return d.y; })]);
 
@@ -80,7 +76,7 @@ Stats.prototype.loadNetwork = function(network) {
       .call(yAxis)
     .append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 6)
+      .attr("y", -40)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("Frequency");
@@ -89,11 +85,10 @@ Stats.prototype.loadNetwork = function(network) {
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
-      .attr("x", function(d) { return x(d.x); })
+      .attr("x", function(d) { return Math.round(x(d.x)); })
       .attr("width", x.rangeBand())
       .attr("y", function(d) { return y(d.y); })
       .attr("height", function(d) { return height - y(d.y); });
-//});
 
 }
 

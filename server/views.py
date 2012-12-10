@@ -61,7 +61,7 @@ def upload_file(request):
     pagerank = nx.pagerank(G)
     degree_centrality = nx.degree_centrality(G)
     average_neighbor_degree = nx.average_neighbor_degree(G)
-    for idx in range(len(G.node)):
+    for idx in G.node:
         if 'country_code' in G.node[idx] and G.node[idx]['country_code'] in ctor:
             G.node[idx]['region'] = ctor[G.node[idx]['country_code']]
         else:
@@ -122,7 +122,7 @@ def get_ds(request, ds_id):
 def get_deg_dist(G):
     deg_dist = Counter()
     max_deg = 0
-    for idx in range(len(G.node)):
+    for idx in G.node:
         deg = G.degree(idx)
         print >>sys.stderr, deg
         if deg not in deg_dist:
