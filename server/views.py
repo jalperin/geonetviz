@@ -54,6 +54,7 @@ def upload_file(request):
         return "ERROR_UNKNOWN_FORMAT"
 
     ctor = pickle.load(open('DATASETS/country_to_continent.pkl', 'r'))
+    code_to_country = pickle.load(open('DATASETS/code_to_country.pkl', 'r'))
 
     closeness_vitality = nx.closeness_vitality(G)
     pagerank = nx.pagerank(G)
@@ -64,6 +65,11 @@ def upload_file(request):
             G.node[idx]['region'] = ctor[G.node[idx]['country_code']]
         else:
             G.node[idx]['region'] = 'Unknown'
+
+        if 'country_code' in G.node[idx] and G.node[idx]['country_code'] in code_to_country:
+            G.node[idx]['country_name'] = code_to_country[G.node[idx]['country_code']]
+        else:
+            G.node[idx]['country_name'] = 'Unknown'
 
         G.node[idx]['closeness_vitality'] = closeness_vitality[idx]
         G.node[idx]['pagerank'] = pagerank[idx]
