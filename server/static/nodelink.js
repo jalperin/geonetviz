@@ -98,6 +98,9 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		.attr("x2", function(d) { return d.target.x; })
 		.attr("y2", function(d) { return d.target.y; })
 		.attr("class", "link")
+		.attr("opacity", .4)
+		.style("stroke", "gray")
+		// FIXME: weights can be VERY large so sqrt is not enough, need to normalize
 	    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
 
 
@@ -120,19 +123,26 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		content = '<p>' + p.country_name + '</span></p>';
    		content += '<hr class="tooltip-hr">';
     	content += '<p>' + p.region + '</span></p>';
-   		nodelink.tooltip.showTooltip(content,d3.event);	
+   		nodelink.tooltip.showTooltip(content,d3.event);
 
-		links.selectAll("line")
-			.attr("stroke",
-				function(d) { if  (d.source == p ) {
-								return '#555';
-					} else { return '#ddd'; }
+		nodelink.link_group.selectAll("line")
+			.attr("opacity",
+				function(d) {
+					if  (d.source.id == p.id || d.target.id == p.id) {
+								return 1;
+					} else { return .4; }
+				})
+			.style("stroke",
+				function(d) {
+					if  (d.source.id == p.id || d.target.id == p.id) {
+								return 'red';
+					} else { return 'gray'; }
 				}) ;
 
-	
+
  		d3.select(this).style("stroke","black")
-      	.style("stroke-width", 2.0); 
-		
+      	.style("stroke-width", 2.0);
+
 	});
 
 	nodes.on("mouseout", function(d) {
