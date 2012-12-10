@@ -29,9 +29,10 @@ NodeLink.prototype.redraw = function() {
 
 NodeLink.prototype.init = function() {
 	this.force = d3.layout.force()
-		.gravity(0.2)
+		.gravity(0.1)
     	.charge(-200)
-   		.linkDistance(50)
+   		.linkDistance(0.5)
+		.linkStrength(0.1)
    		.size([nodelink.w, nodelink.h]);
 
 	this.tooltip = Tooltip("vis-tooltip", 230);
@@ -116,26 +117,24 @@ NodeLink.prototype.loadNetwork = function(graph) {
 	 	.style("fill", function(d) { return colourscale(d.region); });
 
 	nodes.on("mouseover", function(d) {
-		content = '<p>' + d.country_code + '</span></p>';
+		content = '<p>' + d.country_name + '</span></p>';
    		content += '<hr class="tooltip-hr">';
     	content += '<p>' + d.region + '</span></p>';
    		nodelink.tooltip.showTooltip(content,d3.event);	
 
 		
-	 d3.select(this).style("stroke","black")
-      .style("stroke-width", 2.0); 
+		d3.select(this).style("stroke","black")
+      	.style("stroke-width", 2.0); 
 		
 	});
 
 	nodes.on("mouseout", function(d) {
    		nodelink.tooltip.hideTooltip();
-	 d3.select(this).attr("class", "link")
-	 	.style("stroke-width", function(d) { return Math.sqrt(d.weight); });
+		d3.select(this).attr("class", "link")
+	 	.style("stroke-width", 0.1);
 	});
 
-
-
-	 nodelink.loading.remove();
+	nodelink.loading.remove();
 
 	}, 10);
 }
