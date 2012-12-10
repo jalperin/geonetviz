@@ -86,4 +86,5 @@ def get_ds(request, ds_id):
             G=SG
 
     pp.pprint(G.nodes(data=True))
+    pp.pprint(G.edges(data=True))
     return HttpResponse(json.dumps(json_graph.node_link_data(G)), mimetype="application/json")
