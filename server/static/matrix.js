@@ -150,7 +150,7 @@ Matrix.prototype.loadNetwork = function(network) {
         .attr("transform", function(d) { return "translate(" + matrix.x(d.id) + ")rotate(-90)"; });
 
      t.selectAll(".cell")
-        .delay(function(d, i) { return i * 4; })
+        .delay(function(d, i) { return d.s * 4; })
         .attr("x", function(d) { return matrix.x(d.t); })
         .attr("width", matrix.x.rangeBand())
         .attr("height", matrix.x.rangeBand());
@@ -180,7 +180,7 @@ Matrix.prototype.order = function(order) {
         .attr("transform", function(d) { return "translate(" + matrix.x(d.id) + ")rotate(-90)"; });
 
      t.selectAll(".cell")
-        .delay(function(d, i) { return i * 4; })
+        .delay(function(d, i) { return d.s * 4; })
         .attr("x", function(d) { return matrix.x(d.t); })
         .attr("width", matrix.x.rangeBand())
         .attr("height", matrix.x.rangeBand());
