@@ -79,6 +79,7 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		 .start();
 
 	 for (var i = nodelink.n * nodelink.n; i > 0; --i) nodelink.force.tick();
+
 	 nodelink.force.stop();
 
 	 var links = nodelink.link_group.selectAll("line")
@@ -90,7 +91,7 @@ NodeLink.prototype.loadNetwork = function(graph) {
 	links
 		.exit().remove();
 
-	nodelink.link_group.selectAll("line")
+	var otherlink = nodelink.link_group.selectAll("line")
 		.attr("x1", function(d) { return d.source.x; })
 		.attr("y1", function(d) { return d.source.y; })
 		.attr("x2", function(d) { return d.target.x; })
@@ -118,8 +119,20 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		content = '<p>' + d.country_code + '</span></p>';
    		content += '<hr class="tooltip-hr">';
     	content += '<p>' + d.region + '</span></p>';
-   		nodelink.tooltip.showTooltip(content,d3.event);						
+   		nodelink.tooltip.showTooltip(content,d3.event);	
+
+		
+	 d3.select(this).style("stroke","black")
+      .style("stroke-width", 2.0); 
+		
 	});
+
+	nodes.on("mouseout", function(d) {
+   		nodelink.tooltip.hideTooltip();
+	 d3.select(this).attr("class", "link")
+	 	.style("stroke-width", function(d) { return Math.sqrt(d.weight); });
+	});
+
 
 
 	 nodelink.loading.remove();
