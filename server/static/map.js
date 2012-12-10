@@ -58,7 +58,7 @@ Map.prototype.init = function() {
 	    .enter().append("path")
 	      .attr("d", map.path)
 	      .attr("country_code", function(d) { return d.id; })
-	      .on("click", map.click);
+	      .on("mouseover", map.mouseover);
 	});
 }
 
@@ -82,7 +82,10 @@ Map.prototype.loadNetwork = function(network) {
 	  .exit()
 	    .remove();
 
-	map.arc_group.selectAll("path").attr("d", map.arcpath);
+	map.arc_group.selectAll("path")
+	// FIXME: this should be set from the CSS
+		.attr("opacity", .4)
+		.attr("d", map.arcpath);
 }
 
 Map.prototype.arcpath = function(d) {
@@ -105,27 +108,38 @@ Map.prototype.zoommove = function () {
 	map.arc_group.selectAll("path").attr("d", map.arcpath);
 }
 
-Map.prototype.click = function (d) {
-	var x = 0,
-	  y = 0,
-	  k = 1;
-
-	  // same this vs map question here
-	if (d && map.centered !== d) {
-	var centroid = map.path.centroid(d);
-	x = -centroid[0];
-	y = -centroid[1];
-	k = 4;
-	map.centered = d;
-	} else {
-	map.centered = null;
+Map.prototype.mouseover = function (p) {
+	// FIXME: this not elevant at all
+	node = null;
+	for (var i=0; i < map.data.nodes.length; i++) {
+		if (map.data.nodes[i].country_code == p.id) {
+			node = map.data.nodes[i];
+			break;
+		}
 	}
 
-	map.country_group.selectAll("path")
-	  .classed("active", map.centered && function(d) { return d === map.centered; });
+	content = '<p>' + node.country_name + '</span></p>';
+	content += '<hr class="tooltip-hr">';
+	content += '<p>' + node.region + '</span></p>';
+	nodelink.tooltip.showTooltip(content,d3.event);
 
-	map.country_group.transition()
-	  .duration(1000)
-	  .attr("transform", "scale(" + k + ")translate(" + x + "," + y + ")")
-	  .style("stroke-width", 1.5 / k + "px");
-}
+
+	map.arc_group.selectAll("path")
+		.attr("opacity",
+			function(d) {
+				if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
+					return 1;
+				} else {
+					return .4;
+				}
+			})
+		.style("stroke",
+			function(d) {
+				if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
+					return 'red';
+				} else {
+					return '#999';
+				}
+			}) ;
+
+  }
