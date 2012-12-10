@@ -5,7 +5,7 @@ function NodeLink() {
 	// parameters
 	this.margin = {top: 20, right: 10, bottom: 10, left: 20};
 	this.w = 800;
-	this.h = 500;
+	this.h = 800;
 	this.r = 6;
 	this.n = 100;
 	this.selector = "#nodelinkview > #nodelink";
@@ -18,6 +18,7 @@ function NodeLink() {
 	this.tooltip = null;
 	this.node_group = null;
 	this.link_group = null;
+	this.linkedByIndex = {};
 }
 
 NodeLink.prototype.redraw = function() {
@@ -29,7 +30,7 @@ NodeLink.prototype.redraw = function() {
 
 NodeLink.prototype.init = function() {
 	this.force = d3.layout.force()
-		.gravity(0.1)
+		.gravity(0.2)
     	.charge(-200)
    		.linkDistance(0.5)
 		.linkStrength(0.1)
@@ -98,8 +99,6 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		.attr("x2", function(d) { return d.target.x; })
 		.attr("y2", function(d) { return d.target.y; })
 		.attr("class", "link")
-		.attr("opacity", .4)
-		.style("stroke", "gray")
 		// FIXME: weights can be VERY large so sqrt is not enough, need to normalize
 	    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
 
@@ -120,9 +119,9 @@ NodeLink.prototype.loadNetwork = function(graph) {
 	 	.style("fill", function(d) { return colourscale(d.region); });
 
 	nodes.on("mouseover", function(p) {
-		content = '<p>' + p.country_name + '</span></p>';
+		content = '<p>' + p.country_code + ', ' + p.region + '</span></p>';
    		content += '<hr class="tooltip-hr">';
-    	content += '<p>' + p.region + '</span></p>';
+    	content += '<p>' + p.degree + ' links' + '; ' + Math.round(p.average_neighbor_degree) + ' avg neighbor links' + '</span></p>';
    		nodelink.tooltip.showTooltip(content,d3.event);
 
 		nodelink.link_group.selectAll("line")
@@ -130,15 +129,14 @@ NodeLink.prototype.loadNetwork = function(graph) {
 				function(d) {
 					if  (d.source.id == p.id || d.target.id == p.id) {
 								return 1;
-					} else { return .4; }
+					} else { return .5; }
 				})
 			.style("stroke",
 				function(d) {
 					if  (d.source.id == p.id || d.target.id == p.id) {
-								return 'red';
-					} else { return 'gray'; }
+								return '#555';
+					} else { return '#ddd'; }
 				}) ;
-
 
  		d3.select(this).style("stroke","black")
       	.style("stroke-width", 2.0);
@@ -149,6 +147,8 @@ NodeLink.prototype.loadNetwork = function(graph) {
    		nodelink.tooltip.hideTooltip();
 		d3.select(this).attr("class", "link")
 	 	.style("stroke-width", 0.1);
+		nodelink.link_group.selectAll("line")
+			.attr("opacity", 0.8)
 	});
 
 	nodelink.loading.remove();
