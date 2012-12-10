@@ -118,7 +118,7 @@ Map.prototype.mouseover = function (p) {
 		}
 	}
 
-	content = '<p>' + node.country_code + ', ' + node.region + '</span></p>';
+	content = '<p>' + node.country_name + ', ' + node.region + '</span></p>';
 	content += '<hr class="tooltip-hr">';
     content += '<p>' + node.degree + ' links' + '; ' + Math.round(node.average_neighbor_degree) + ' avg neighbor links' + '</span></p>';
 	nodelink.tooltip.showTooltip(content,d3.event);
