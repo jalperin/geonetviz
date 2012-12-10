@@ -118,11 +118,11 @@ Map.prototype.mouseover = function (p) {
 		}
 	}
 
-	content = '<p>' + node.country_name + '</span></p>';
+	content = '<p>' + node.country_code + ', ' + node.region + '</span></p>';
 	content += '<hr class="tooltip-hr">';
-	content += '<p>' + node.region + '</span></p>';
+    content += '<p>' + node.degree + ' links' + '; ' + Math.round(node.average_neighbor_degree) + ' avg neighbor links' + '</span></p>';
 	nodelink.tooltip.showTooltip(content,d3.event);
-
+// FIXME: bet it has to do with the fact that we are using nodelink.tooltip here rather than a map.tooltip
 
 	map.arc_group.selectAll("path")
 		.attr("opacity",
@@ -136,10 +136,30 @@ Map.prototype.mouseover = function (p) {
 		.style("stroke",
 			function(d) {
 				if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
-					return 'red';
+					return '#555';
 				} else {
-					return '#999';
+					return '#ddd';
 				}
 			}) ;
+
+  }
+
+
+Map.prototype.mouseout = function (p) {
+	// FIXME: this not elevant at all
+	node = null;
+	for (var i=0; i < map.data.nodes.length; i++) {
+		if (map.data.nodes[i].country_code == p.id) {
+			node = map.data.nodes[i];
+			break;
+		}
+	}
+
+	nodelink.tooltip.hideTooltip();
+
+	map.arc_group.selectAll("path")
+		.attr("opacity", 0.8)
+		.style("stroke", '#555');
+;
 
   }
