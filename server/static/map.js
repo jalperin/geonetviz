@@ -1,3 +1,4 @@
+
 function Map() {
 	// parameters
 	this.width = 1000;
@@ -147,13 +148,6 @@ Map.prototype.mouseover = function (p) {
 
 Map.prototype.mouseout = function (p) {
 	// FIXME: this not elevant at all
-	node = null;
-	for (var i=0; i < map.data.nodes.length; i++) {
-		if (map.data.nodes[i].country_code == p.id) {
-			node = map.data.nodes[i];
-			break;
-		}
-	}
 
 	nodelink.tooltip.hideTooltip();
 
