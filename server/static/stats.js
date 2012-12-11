@@ -14,7 +14,6 @@ function Stats() {
 }
 
 Stats.prototype.init = function(num_graphs) {
-    num_graphs=1;
     this.svg = d3.range(num_graphs);
     d3.range(num_graphs).forEach(function(el, idx, arr) { stats.init_one(idx); })
 }
