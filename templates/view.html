@@ -87,7 +87,6 @@
 	</head>
 	<body>
 
-
 			<div class="container">
 		<p>.</p>
 		<div class="inline">
@@ -99,18 +98,23 @@
 		<div class="tabbable">
 
 		<ul class="nav nav-tabs">
-		<li class="active"><a href="#mapview" data-toggle="tab">Map View</a></li>
-		<li class=""><a href="#nodelinkview" data-toggle="tab">Node-Link View</a></li>
-		<li class=""><a href="#matrixview" data-toggle="tab">Matrix View</a></li>
-        <li class=""><a href="#statsview" data-toggle="tab">Statistics</a></li>
-		<li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> Filters<b class="caret"></b></a>
-				 <ul class="dropdown-menu">
-                        <li><a href="#" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22South+America%22%5D%7D%7D')" id="AfricaSouthAmerica">Africa and South America</a></li>
-                        <li><a href="#"  onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D')"  id="eidechse">Africa and North America</a></li>
-                        <li><a href="#"  onclick="updateViews(ds_id)" id="iguana">All</a></li>
-                  </ul>
+			<li class="active"><a href="#mapview" data-toggle="tab">Map View</a></li>
+			<li class=""><a href="#nodelinkview" data-toggle="tab">Node-Link View</a></li>
+			<li class=""><a href="#matrixview" data-toggle="tab">Matrix View</a></li>
+			<li class=""><a href="#statsview" data-toggle="tab">Statistics</a></li>
+			<li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> Filter<b class="caret"></b></a>
+				<ul class="dropdown-menu">		
+					<li><a id="chk1" class="multicheck" href="#"  onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22South+America%22%5D%7D%7D')">Africa
+               	  <span class="pull-right"></span></a></li>
+					<li><a id="chk2" class="multicheck" href="#" onclick="updateViews(ds_id, 'json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D')">North America
+                      <span class="icon-ok pull-right"></span></a></li>
+				</ul>
 			</li>
-    		</ul>
+			<li class="dropdown pull-right"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> Label<b class="caret"></b></a>		
+				<ul class="dropdown-menu"> 
+						<li><a href="#">Country Name</a></li>
+				</ul>	
+    	</ul>
 
 		<div class="tab-content">
 			<div class="tab-pane active" id="mapview">
@@ -172,6 +176,25 @@
 			// updateViews(ds_id, "json=%7B%22filters%22%3A%7B%22region%22%3A%5B%22Africa%22%2C%22North+America%22%5D%7D%7D");
 			updateViews(ds_id);
 	</script>
+
+
+	
+	<script type="text/javascript">
+    $(document).ready(function() {
+      /* Multi select - allow multiple selections */
+      /* Allow click without closing menu */
+      /* Toggle checked state and icon */
+      $('.multicheck').click(function(e) {     
+         $(this).toggleClass("checked"); 
+         $(this).find("span").toggleClass("icon-ok"); 
+         return false;
+      });
+
+        
+    });
+    </script>
+
+
 
 	<script>
 $(function ()
