@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template import Context, loader
 from django.views.decorators.csrf import csrf_exempt # TODO don't use this
-import json, sys, pprint
+import json, sys, pprint, os, csv
 import cPickle as pickle
 import datetime, random
 from django.shortcuts import redirect
@@ -31,10 +31,27 @@ def view_ds(request, ds_id):
 
 def upload_file(request):
     f = request.FILES['ds']
-    json_ds = json.load(f)
 
-    ##pp = pprint.PrettyPrinter(stream=sys.stderr)
-    ##pp.pprint(ds)
+    # little bit of hacking...
+    format_type = 'json'
+    try:
+        ds = json.load(f)
+    except:
+        rows = csv.reader(f)
+        ds = list()
+        names = list()
+        for row in rows:
+            if len(names) == 0:
+                for v in row:
+                    names.append(v)
+            else:
+                idx = 0
+                cur = dict()
+                for v in row:
+                    cur[names[idx]] = v
+                    idx += 1
+                ds.append(cur)
+        format_type = 'csv'
 
     # Create network
     G = nx.Graph()
@@ -44,13 +61,47 @@ def upload_file(request):
     ds_id = "%d%d%d%d%d%d.%d" % (now.year, now.month, now.day, now.hour, now.minute, now.second, random.randint(0, 100000))
 
     # known formats.
-    if len(json_ds['links']) > 0 and len(json_ds['nodes']) > 0:
+    # based on collab2008.json
+    if (type(ds) == type(dict()) and 
+        'links' in ds and
+        'nodes' in ds and
+        len(ds['links']) > 0 and 
+        len(ds['nodes']) > 0):
         idx = 0
-        for node in json_ds['nodes']:
+        for node in ds['nodes']:
             G.add_node(idx, country_code=node['id'])
             idx += 1
-        for link in json_ds['links']:
+        for link in ds['links']:
             G.add_edge(link['source'], link['target'], weight=link['weight'])
+
+    # based on elena's airbnb data, formatted as csv, with columns:
+    # ego_name, ego_lat, ego_lng, alter_name, alter_lat, alter_lng, weight
+    elif (type(ds) == type(list()) and
+          type(ds[0]) == type(dict()) and
+          'ego_name' in ds[0] and
+          'alter_name' in ds[0]):
+        node_names = set()
+        name_to_ll = dict()
+        for d in ds:
+            node_names.add(d['ego_name'])
+            node_names.add(d['alter_name'])
+            name_to_ll[d['ego_name']] = {
+                'lat': d['ego_lat'],
+                'lng': d['ego_lng']}
+            name_to_ll[d['alter_name']] = {
+                'lat': d['alter_lat'],
+                'lng': d['alter_lng']}
+
+        nodemap = dict()
+        idx = 0
+        for node_name in node_names:
+            if node_name not in nodemap:
+                G.add_node(idx, name=node_name, lat=name_to_ll[node_name]['lat'], lng=name_to_ll[node_name]['lng'])
+                nodemap[node_name] = idx
+                idx += 1
+
+        for d in ds:
+            G.add_edge(nodemap[d['ego_name']], nodemap[d['alter_name']], weight=int(d['weight']))
     else:
         return "ERROR_UNKNOWN_FORMAT"
 
@@ -74,6 +125,10 @@ def upload_file(request):
     # Add *EXTRA* data. Not always guaranteed to be returned.
     ctor = pickle.load(open('DATASETS/country_to_continent.pkl', 'r'))
     code_to_country = pickle.load(open('DATASETS/code_to_country.pkl', 'r'))
+
+    pp = pprint.PrettyPrinter(stream=sys.stderr)
+    pp.pprint(G.nodes(data=True))
+    pp.pprint(G.edges(data=True))
 
     closeness_vitality = nx.closeness_vitality(G)
     pagerank = nx.pagerank(G)
