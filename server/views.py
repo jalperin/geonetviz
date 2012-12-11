@@ -54,6 +54,24 @@ def upload_file(request):
     else:
         return "ERROR_UNKNOWN_FORMAT"
 
+    # Make sure that *every node* has a lat/lng
+    no_geo = [] # maintain list of nodes removed
+    ccode_to_ll = pickle.load(open('DATASETS/code_to_latlng.pkl', 'r'))
+    for idx in G.node:
+        # todo use HttpResponseBadRequest if no lat/lng exists
+        if 'lat' not in G.node[idx] or 'lng' not in G.node[idx]:
+            if 'country_code' in G.node[idx] and G.node[idx]['country_code'] in ccode_to_ll:
+                c = G.node[idx]['country_code']
+                G.node[idx]['lat'] = ccode_to_ll[c]['lat']
+                G.node[idx]['lng'] = ccode_to_ll[c]['lng']
+            else:
+                no_geo.append(idx)
+
+    # remove nodes with missing geo info
+    for idx in no_geo:
+        G.remove_node(idx)
+
+    # Add *EXTRA* data. Not always guaranteed to be returned.
     ctor = pickle.load(open('DATASETS/country_to_continent.pkl', 'r'))
     code_to_country = pickle.load(open('DATASETS/code_to_country.pkl', 'r'))
 
@@ -80,6 +98,8 @@ def upload_file(request):
 
     f = open("DATASETS/graph%s.pickle" % ds_id, 'w')
     pickle.dump(G, f)
+
+    print >>sys.stderr, "UPLOAD COMPLETE. %d NODES IGNORED DUE TO MISSING GEO DATA." % len(no_geo)
 
     return ds_id
 
