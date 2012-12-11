@@ -125,7 +125,6 @@ def get_ds(request, ds_id):
     #pp.pprint(G.edges(data=True))
 
     deg_dist = get_deg_dist(G)
-    pp.pprint(deg_dist)
 
     json_data = json_graph.node_link_data(G)
     json_data['extra_graphs'] = [
@@ -144,7 +143,6 @@ def get_deg_dist(G):
     max_deg = 0
     for idx in G.node:
         deg = G.degree(idx)
-        print >>sys.stderr, deg
         if deg not in deg_dist:
             deg_dist[deg] = 0
         deg_dist[deg] += 1
