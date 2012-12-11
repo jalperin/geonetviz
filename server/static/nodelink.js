@@ -4,8 +4,8 @@
 function NodeLink() {
 	// parameters
 	this.margin = {top: 20, right: 10, bottom: 10, left: 20};
-	this.w = 800;
-	this.h = 800;
+	this.w = 900;
+	this.h = 900;
 	this.r = 6;
 	this.n = 100;
 	this.selector = "#nodelinkview > #nodelink";
@@ -30,7 +30,7 @@ NodeLink.prototype.redraw = function() {
 
 NodeLink.prototype.init = function() {
 	this.force = d3.layout.force()
-		.gravity(0.2)
+		.gravity(0.1)
     	.charge(-200)
    		.linkDistance(0.5)
 		.linkStrength(0.1)
@@ -68,6 +68,14 @@ NodeLink.prototype.init = function() {
 
 
 NodeLink.prototype.loadNetwork = function(graph) {
+
+	// moved this here so that gravity is changed depending on the size of the graph (need to test on more graphs - picked these numbers based on the two we have)
+	nodelink.force.charge( function(d) {
+			if  (graph.links.length > 200) {
+								return -200;
+					} else { return -2000; }
+ 			 });
+
 	 setTimeout(function() {
 
 	 // set the id's of the links to something we can refer to
@@ -99,8 +107,7 @@ NodeLink.prototype.loadNetwork = function(graph) {
 		.attr("x2", function(d) { return d.target.x; })
 		.attr("y2", function(d) { return d.target.y; })
 		.attr("class", "link")
-		// FIXME: weights can be VERY large so sqrt is not enough, need to normalize
-	    .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
+	    .style("stroke-width", 0.7);
 
 
 	 var nodes = nodelink.node_group.selectAll("circle")
@@ -119,7 +126,7 @@ NodeLink.prototype.loadNetwork = function(graph) {
 	 	.style("fill", function(d) { return colourscale(d.region); });
 
 	nodes.on("mouseover", function(p) {
-		content = '<p>' + p.country_name + ', ' + p.region + '</span></p>';
+		content = '<p>' + p.name + '</span></p>';
    		content += '<hr class="tooltip-hr">';
     	content += '<p>' + p.degree + ' links' + '; ' + Math.round(p.average_neighbor_degree) + ' avg neighbor links' + '</span></p>';
    		nodelink.tooltip.showTooltip(content,d3.event);
@@ -128,13 +135,13 @@ NodeLink.prototype.loadNetwork = function(graph) {
 			.attr("opacity",
 				function(d) {
 					if  (d.source.id == p.id || d.target.id == p.id) {
-								return 1;
+								return 3;
 					} else { return .5; }
 				})
 			.style("stroke",
 				function(d) {
 					if  (d.source.id == p.id || d.target.id == p.id) {
-								return '#555';
+								return '#3c3c3c';
 					} else { return '#ddd'; }
 				}) ;
 
