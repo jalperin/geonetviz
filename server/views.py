@@ -129,11 +129,17 @@ def get_ds(request, ds_id):
     json_data = json_graph.node_link_data(G)
     json_data['extra_graphs'] = [
         {
-            'title': 'A Test of Tests!',
+            'title': 'Degree Distribution',
             'type': 'bar',
             'scale': 'linear',
             'data': deg_dist,
-        }
+        },
+        {
+            'title': 'A Test of Tests!',
+            'type': 'bar',
+            'scale': 'linear',
+            'data': [{'x': 0, 'y': 4}, {'x': 1, 'y': 10+random.randint(0,100)}, {'x': 2, 'y': 20}, {'x': 3, 'y': 30}, {'x': 4, 'y': 14}, ],
+        },
     ]
 
     return HttpResponse(json.dumps(json_data), mimetype="application/json")
