@@ -9,6 +9,7 @@ function Map() {
 	this.centered = null;
 	this.projection = null;
 	this.path = null;
+	this.greatArc = null;
 	this.svg = null;
 	this.g = null;
 	this.country_group = null;
@@ -25,6 +26,10 @@ Map.prototype.init = function() {
 
 	this.path = d3.geo.path()
 	    .projection(this.projection);
+
+	this.greatArc = d3.geo.greatArc().precision(1);
+	this.greatArc.source(function(link) { return [map.data.nodes[link.source].lng, map.data.nodes[link.source].lat]})
+	this.greatArc.target(function(link) { return [map.data.nodes[link.target].lng, map.data.nodes[link.target].lat]})
 
 	this.zoom = d3.behavior.zoom()
 	    .translate(this.projection.translate())
@@ -90,17 +95,8 @@ Map.prototype.loadNetwork = function(network) {
 }
 
 Map.prototype.arcpath = function(d) {
-	var tmp_src = map.country_group.selectAll('[country_code=' + map.data.nodes[d.source].country_code + ']');
-	var tmp_tgt = map.country_group.selectAll('[country_code=' + map.data.nodes[d.target].country_code + ']');
-
-	if (tmp_src[0].length && tmp_tgt[0].length ) {
-		var source_country = tmp_src.datum();
-		var target_country = tmp_tgt.datum();
-		var line = d3.svg.line();
-		return line([map.path.centroid(source_country), map.path.centroid(target_country)]);
-	}
+	return splitPath(map.path(map.greatArc(d)));
 }
-
 
 Map.prototype.zoommove = function () {
 	// FIXME: how to get reference to map instance in a non-global way?
@@ -123,37 +119,60 @@ Map.prototype.mouseover = function (p) {
 	content += '<hr class="tooltip-hr">';
     content += '<p>' + node.degree + ' links' + '; ' + Math.round(node.average_neighbor_degree) + ' avg neighbor links' + '</span></p>';
 	nodelink.tooltip.showTooltip(content,d3.event);
-// FIXME: bet it has to do with the fact that we are using nodelink.tooltip here rather than a map.tooltip
 
+	// FIXME: bet it has to do with the fact that we are using nodelink.tooltip here rather than a map.tooltip
 	map.arc_group.selectAll("path")
 		.attr("opacity",
 			function(d) {
 				if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
 					return 1;
 				} else {
-					return .4;
+					return .6;
 				}
 			})
 		.style("stroke",
 			function(d) {
 				if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
-					return '#555';
+					return '##999';
 				} else {
 					return '#ddd';
 				}
 			}) ;
-
-  }
-
+}
 
 Map.prototype.mouseout = function (p) {
 	// FIXME: this not elevant at all
-
 	nodelink.tooltip.hideTooltip();
 
 	map.arc_group.selectAll("path")
 		.attr("opacity", 0.8)
 		.style("stroke", '#555');
-;
+}
 
+function splitPath(path) {
+  var avgd = 0, i, d;
+  var c, pc, dx, dy;
+  var points = path.split("L");
+  if (points.length < 2) return path;
+  var newpath = [ points[0] ];
+  var coords = points.map(function(d, i) {
+    return d.substr(i > 0 ? 0 : 1).split(","); // remove M and split
+  });
+
+  // calc avg dist between points
+  for (i = 1; i < coords.length; i++) {
+    pc = coords[i-1]; c = coords[i];
+    dx = c[0] - pc[0]; dy = c[1] - pc[1];
+    d = Math.sqrt(dx*dx + dy*dy);
+    c.push(d);  // push dist as last elem of c
+    avgd += d;
   }
+  avgd /= coords.length - 1;
+
+  // for points with long dist from prev use M instead of L
+  for (i = 1; i < coords.length; i++) {
+    c = coords[i];
+    newpath.push((c[2] > 5 * avgd ? "M" : "L") + points[i]);
+  }
+  return newpath.join();
+}
