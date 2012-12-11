@@ -23,12 +23,19 @@
 
 				<form action="/upload/" method="POST" enctype="multipart/form-data" id="uploadform">
 
-						<!-- too make this first button pretty, the type has to be button. but to upload a file, the type has to be file. -->
 
-				<input class="btn btn-file btn-success btn-large btn-block" name="ds" id="ds" enctype="multipart/form-data" type="file" value="Select A File"/>
+						<div class="fileupload fileupload-new" data-provides="fileupload">
+  <span class="btn btn-file btn-large btn-block btn-success"><span class="fileupload-new">Select a file</span><span class="fileupload-exists">Change</span><input name="ds" id="ds" enctype="multipart/form-data" type="file" /></span>
+  <span class="fileupload-preview"></span>
+  <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
+</div>
+
 				<input class="btn btn-large btn-block" type="submit" value="Submit">
 
 				<p style="color:#0088cc; text-align: center;margin-top:20px; margin-botton:20px;"><a style="text-decoration:underline;" href="#" id="file-formats" rel="popover" data-content="We support three types of file formats: 1. all-in-one JSON format: one field called 'nodes', one field called 'edges' or 'links'. 2. Two JSON files, one being edges, the other being links. 3. CSV format with headers. Note that there must be either a country_code and/or lat/lng fields." data-original-title="Acceptable File Formats">What file formats do we accept?</a></p>
+
+
+
 
 
 		</div>	
