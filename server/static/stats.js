@@ -6,12 +6,20 @@ function Stats() {
 	this.selector = "#statsview > #stats";
 
 	// public properties
-	this.svg = null;
+	this.svg = [];
 	this.data = null;
     this.vars = null;
+
+    this.has_init = false;
 }
 
-Stats.prototype.init = function() {
+Stats.prototype.init = function(num_graphs) {
+    num_graphs=1;
+    this.svg = d3.range(num_graphs);
+    d3.range(num_graphs).forEach(function(el, idx, arr) { stats.init_one(idx); })
+}
+
+Stats.prototype.init_one = function(idx) {
 
     var x = d3.scale.ordinal()
         .rangeBands([0, this.width], .2);
@@ -27,7 +35,7 @@ Stats.prototype.init = function() {
         .scale(y)
         .orient("left");
 
-    this.svg = d3.select(this.selector).append("svg")
+    this.svg[idx] = d3.select(this.selector).append("svg")
         .attr("width", this.width + this.margin.left + this.margin.right)
         .attr("height", this.height + this.margin.top + this.margin.bottom)
       .append("g")
@@ -36,12 +44,12 @@ Stats.prototype.init = function() {
     x.domain([1, 2, 3, 4, 5])
     y.domain([0, 100])
 
-      this.svg.append("g")
+    this.svg[idx].append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + this.height + ")")
       .call(xAxis);
 
-  this.svg.append("g")
+    this.svg[idx].append("g")
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
@@ -52,9 +60,9 @@ Stats.prototype.init = function() {
       .text("Frequency");
 
     var height=this.height;
-    this.bars = this.svg.selectAll(".bar").data([1, 2, 3, 4, 5]);
+    bars = this.svg[idx].selectAll(".bar").data([1, 2, 3, 4, 5]);
 
-    this.bars
+    bars
       .enter().append("rect")
         .attr("class", "bar")
         .attr("x", function(d) { return 5; })
@@ -62,15 +70,20 @@ Stats.prototype.init = function() {
         .attr("y", function(d) { return 10; })
         .attr("height", function(d) { return height - 10; });
 
-    //this.bars.exit().remove();
-
 }
 
 Stats.prototype.loadNetwork = function(network) {
+    if (!this.has_init) {
+        this.init(network.extra_graphs.length);
+        this.has_init = true;
+    }
+
 	this.data = network;
 
-    var data = this.data.extra_graphs[0].data;
+    this.data.extra_graphs.forEach(function(el, idx, arr) { stats.load_one(el.data, idx); })
+}
 
+Stats.prototype.load_one = function(data, idx) {
     var xdomain = data.map(function(d) { return d.x; });
     var x = d3.scale.ordinal()
         .domain(xdomain)
@@ -96,23 +109,23 @@ Stats.prototype.loadNetwork = function(network) {
     x.domain(data.map(function(d) { return d.x; }));
     y.domain([0, d3.max(data, function(d) { return d.y; })]);
 
-    this.svg.select(".x.axis").call(xAxis);
-    this.svg.select(".y.axis").call(yAxis);
+    this.svg[idx].select(".x.axis").call(xAxis);
+    this.svg[idx].select(".y.axis").call(yAxis);
 
     var height=this.height;
-    this.bars = this.svg.selectAll('.bar').data(data)
-    this.bars
+    bars = this.svg[idx].selectAll('.bar').data(data)
+    bars
         .enter().append('rect')
         .attr('class', 'bar')
 
-    this.bars
+    bars
         .transition().duration(2000).delay(100)
         .attr("x", function(d) { return Math.round(x(d.x)); })
         .attr("width", x.rangeBand())
         .attr("y", function(d) { return y(d.y); })
         .attr("height", function(d) { return height - y(d.y); });
 
-    this.bars
+    bars
         .exit()
         .transition().duration(750)
         .style("fill-opacity", 1e-6)
