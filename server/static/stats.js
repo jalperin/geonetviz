@@ -49,7 +49,7 @@ Stats.prototype.init_one = function(idx) {
         .style("font-size", "24px")
         .text(this.data.extra_graphs[idx].title)
 
-    x.domain([1, 2, 3, 4, 5])
+    x.domain([])
     y.domain([0, 100])
 
     this.svg[idx].append("g")
@@ -76,7 +76,7 @@ Stats.prototype.init_one = function(idx) {
       .text(this.data.extra_graphs[idx].y_label)
 
     var height=this.height;
-    bars = this.svg[idx].selectAll(".bar").data([1, 2, 3, 4, 5]);
+    bars = this.svg[idx].selectAll(".bar").data([]);
 
     bars
       .enter().append("rect")
