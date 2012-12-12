@@ -202,13 +202,18 @@ def get_ds(request, ds_id):
     return HttpResponse(json.dumps(json_data), mimetype="application/json")
 
 def get_pageranks(G):
-    sorted_ranks = sorted([data['pagerank'] for (idx, data) in G.nodes(data=True)], reverse=True)
+    sorted_ranks = sorted([(data['pagerank'], idx) for (idx, data) in G.nodes(data=True)], reverse=True)
 
-    idx = 0
+    cnt = 0
     final = list()
-    for val in sorted_ranks:
-        final.append({'x': idx, 'y': val})
-        idx += 1
+    for (val, idx) in sorted_ranks:
+        name = "Page Rank: %f // Location: %.2f,%.2f" % (val, float(G.node[idx]['lat']), float(G.node[idx]['lng']))
+        if 'country_name' in G.node[idx] and G.node[idx]['country_name'] != "Unknown":
+            name += " (%s)" % G.node[idx]['country_name']
+        elif 'name' in G.node[idx]:
+            name += " (%s)" % G.node[idx]['name']
+        final.append({'x': cnt, 'y': val, 'name': name})
+        cnt += 1
 
     return final
 
@@ -227,7 +232,8 @@ def get_deg_dist(G):
     for d in range(max_deg+1):
         r.append(
             {'x': d,
-             'y': deg_dist[d]
+             'y': deg_dist[d],
+             'name': "%d nodes with %d neighbors" % (deg_dist[d], d) # TODO add list of countries (up to 4...or something...)
             })
 
     return r

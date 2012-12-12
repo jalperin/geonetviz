@@ -111,11 +111,27 @@ Stats.prototype.load_one = function(data, idx) {
     this.svg[idx].select(".x.axis").call(xAxis);
     this.svg[idx].select(".y.axis").call(yAxis);
 
+    var tooltip = d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        .style("padding-left", "10px")
+        .style("padding-right", "10px")
+        .style("padding-top", "5px")
+        .style("padding-bottom", "5px")
+        .style("border-style", "solid")
+        .style("border-width", "1px")
+        .style("background-color", "white");
+
     var height=this.height;
     bars = this.svg[idx].selectAll('.bar').data(data)
     bars
         .enter().append('rect')
         .attr('class', 'bar')
+        .on("mouseover", function(d){return tooltip.text(d.name).style("visibility", "visible");})
+        .on("mousemove", function(d){return tooltip.text(d.name).style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+        .on("mouseout", function(d){return tooltip.text(d.name).style("visibility", "hidden");});
 
     bars
         .transition().duration(2000).delay(100)
