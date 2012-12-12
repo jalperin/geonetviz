@@ -127,8 +127,8 @@ def upload_file(request):
     code_to_country = pickle.load(open('DATASETS/code_to_country.pkl', 'r'))
 
     pp = pprint.PrettyPrinter(stream=sys.stderr)
-    pp.pprint(G.nodes(data=True))
-    pp.pprint(G.edges(data=True))
+    #pp.pprint(G.nodes(data=True))
+    #pp.pprint(G.edges(data=True))
 
     closeness_vitality = nx.closeness_vitality(G)
     pagerank = nx.pagerank(G)
@@ -180,6 +180,8 @@ def get_ds(request, ds_id):
     #pp.pprint(G.edges(data=True))
 
     deg_dist = get_deg_dist(G)
+    pageranks = get_pageranks(G)
+    pp.pprint(pageranks)
 
     json_data = json_graph.node_link_data(G)
     json_data['extra_graphs'] = [
@@ -190,14 +192,25 @@ def get_ds(request, ds_id):
             'data': deg_dist,
         },
         {
-            'title': 'A Test of Tests!',
+            'title': 'PageRanks',
             'type': 'bar',
             'scale': 'linear',
-            'data': [{'x': 0, 'y': 4}, {'x': 1, 'y': 10+random.randint(0,100)}, {'x': 2, 'y': 20}, {'x': 3, 'y': 30}, {'x': 4, 'y': 14}, ],
+            'data': pageranks,
         },
     ]
 
     return HttpResponse(json.dumps(json_data), mimetype="application/json")
+
+def get_pageranks(G):
+    sorted_ranks = sorted([data['pagerank'] for (idx, data) in G.nodes(data=True)], reverse=True)
+
+    idx = 0
+    final = list()
+    for val in sorted_ranks:
+        final.append({'x': idx, 'y': val})
+        idx += 1
+
+    return final
 
 def get_deg_dist(G):
     deg_dist = Counter()
