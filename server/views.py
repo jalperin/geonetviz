@@ -152,6 +152,13 @@ def upload_file(request):
         G.node[idx]['average_neighbor_degree'] = average_neighbor_degree[idx]
         G.node[idx]['weight'] = G.degree(idx, 'weight')
 
+        name = "Location: %.2f,%.2f" % (float(G.node[idx]['lat']), float(G.node[idx]['lng']))
+        if 'name' in G.node[idx]:
+            name += " (%s)" % G.node[idx]['name']
+        elif 'country_name' in G.node[idx] and G.node[idx]['country_name'] != "Unknown":
+            name += " (%s)" % G.node[idx]['country_name']
+        G.node[idx]['name'] = name
+
     f = open("DATASETS/graph%s.pickle" % ds_id, 'w')
     pickle.dump(G, f)
 
@@ -261,12 +268,7 @@ def get_pageranks(G):
     cnt = 0
     final = list()
     for (val, idx) in sorted_ranks:
-        name = "Location: %.2f,%.2f" % (float(G.node[idx]['lat']), float(G.node[idx]['lng']))
-        if 'country_name' in G.node[idx] and G.node[idx]['country_name'] != "Unknown":
-            name += " (%s)" % G.node[idx]['country_name']
-        elif 'name' in G.node[idx]:
-            name += " (%s)" % G.node[idx]['name']
-        final.append({'x': cnt, 'y': val, 'name': name})
+        final.append({'x': cnt, 'y': val, 'name': G.node[idx]['name']})
         cnt += 1
 
     return final
