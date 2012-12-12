@@ -96,6 +96,14 @@ Stats.prototype.loadNetwork = function(network) {
         this.has_init = true;
     }
 
+    $("#stats_text").html(
+        "<div class='stat_row' style='margin-top: 10px;'>There are <span class='stats_highlight'>" + this.data.line_stats.num_nodes + "</span> nodes in the network.</div>" +
+        "<div class='stat_row'>On average, there are <span class='stats_highlight'>" + this.data.line_stats.avg_shortest_path.toFixed(1) + "</span> degrees of separation between nodes.</div>" +
+        "<div class='stat_row'>The best connected node is @ <span class='stats_highlight' style='font-size: 24px'>" + this.data.line_stats.best_connected + "</span>.</div>" +
+        "<div class='stat_row'>It has <span class='stats_highlight'>" + this.data.line_stats.connected_components + "</span> connected component(s).</div>" + 
+        "<div class='stat_row' style='margin-bottom: 20px;'>The network has a diameter of <span class='stats_highlight'>" + this.data.line_stats.diameter + "</span>.</div>"
+    )
+
     this.data.extra_graphs.forEach(function(el, idx, arr) { stats.load_one(el.data, idx); })
 }
 
