@@ -171,11 +171,32 @@ def get_ds(request, ds_id):
     if request.GET and 'json' in request.GET:
         params = json.loads(request.GET['json'])
 
-        for filter in params['filters']:
-            SG = G.subgraph(
-                [n for n, attrdict in G.node.items() if
-                    filter in attrdict and attrdict[filter] in params['filters'][filter]])
-            G=SG
+        if 'filters' in params:
+            for filter in params['filters']:
+                SG = G.subgraph(
+                    [n for n, attrdict in G.node.items() if
+                        filter in attrdict and attrdict[filter] in params['filters'][filter]])
+                G=SG
+
+        if 'filters_continuous' in params and 'node' in params['filters_continuous']:
+            for filter in params['filters_continuous']['node']:
+                max = params['filters_continuous']['node'][filter]['max']
+                min = params['filters_continuous']['node'][filter]['min']
+                SG = G.subgraph(
+                    [n for n, attrdict in G.node.items() if
+                        attrdict[filter] <= max and
+                        attrdict[filter] >= min])
+                G=SG
+
+        if 'filters_continuous' in params and 'edge' in params['filters_continuous']:
+            for filter in params['filters_continuous']['edge']:
+                max = params['filters_continuous']['edge'][filter]['max']
+                min = params['filters_continuous']['edge'][filter]['min']
+                SG=nx.Graph()
+                SG.add_nodes_from(G.nodes(data=True))
+                SG.add_edges_from([ (u,v,d) for u,v,d in G.edges(data=True) if 
+                    d[filter]>=min and d[filter]<=max] )
+                G=SG
 
     #pp.pprint(G.nodes(data=True))
     #pp.pprint(G.edges(data=True))
