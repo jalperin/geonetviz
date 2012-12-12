@@ -64,7 +64,8 @@ Map.prototype.init = function() {
 	    .enter().append("path")
 	      .attr("d", map.path)
 	      .attr("country_code", function(d) { return d.id; })
-	      .on("mouseover", map.mouseover);
+	      .on("mouseover", map.mouseover)
+		  .on("mouseout", map.mouseout);
 	});
 }
 
@@ -146,7 +147,7 @@ Map.prototype.mouseout = function (p) {
 
 	map.arc_group.selectAll("path")
 		.attr("opacity", 0.8)
-		.style("stroke", '#555');
+		.style("stroke", '#999');
 }
 
 function splitPath(path) {
