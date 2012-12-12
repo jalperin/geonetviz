@@ -33,9 +33,7 @@ Matrix.prototype.init = function() {
 	    .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 }
 
-Map.prototype.setZScale = function(z_min, z_max) {
-	z_max = Math.max(data.map(function(n) { return n.z }));
-	z_min = Math.min(data.map(function(n) { return n.z }));
+Matrix.prototype.setZScale = function(z_min, z_max) {
 	if ((z_max - z_min ) > 1000) {
 		this.z = d3.scale.pow().domain([z_min, z_max]).clamp(true);
 	} else {
