@@ -187,17 +187,50 @@ def get_ds(request, ds_id):
     json_data['extra_graphs'] = [
         {
             'title': 'Degree Distribution',
+            'y_label': 'Number of nodes',
+            'x_label': 'Number of neighbors (degree)',
             'type': 'bar',
             'scale': 'linear',
             'data': deg_dist,
         },
         {
-            'title': 'PageRanks',
+            'title': 'PageRank Distribution',
+            'x_label': 'Node rank',
+            'y_label': 'PageRank value',
             'type': 'bar',
             'scale': 'linear',
             'data': pageranks,
         },
     ]
+
+    avg_shortest_path = 0.0
+    avg_shortest_path_Z = 0.0
+    try:
+        for g in nx.connected_component_subgraphs(G):
+            avg_shortest_path += nx.average_shortest_path_length(g)
+            avg_shortest_path_Z+=1.0
+    except:
+        pass
+
+    avg_diameter = 0.0
+    avg_diameter_Z = 0.0
+    try:
+        for g in nx.connected_component_subgraphs(G):
+            avg_diameter += float(nx.diameter(g))
+            avg_diameter_Z += 1
+    except:
+        pass
+
+    avg_diameter /= avg_diameter_Z
+    avg_shortest_path /= avg_shortest_path_Z
+
+    json_data['line_stats'] = {
+        'num_nodes': len(G.node),
+        'avg_shortest_path': avg_shortest_path,
+        'best_connected': pageranks[0]['name'],
+        'connected_components': nx.number_connected_components(G),
+        'diameter': avg_diameter,
+    }
 
     return HttpResponse(json.dumps(json_data), mimetype="application/json")
 
@@ -207,7 +240,7 @@ def get_pageranks(G):
     cnt = 0
     final = list()
     for (val, idx) in sorted_ranks:
-        name = "Page Rank: %f // Location: %.2f,%.2f" % (val, float(G.node[idx]['lat']), float(G.node[idx]['lng']))
+        name = "Location: %.2f,%.2f" % (float(G.node[idx]['lat']), float(G.node[idx]['lng']))
         if 'country_name' in G.node[idx] and G.node[idx]['country_name'] != "Unknown":
             name += " (%s)" % G.node[idx]['country_name']
         elif 'name' in G.node[idx]:

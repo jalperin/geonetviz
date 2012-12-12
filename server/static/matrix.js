@@ -23,7 +23,6 @@ function Matrix() {
 Matrix.prototype.init = function() {
 	this.x = d3.scale.ordinal().rangeBands([0, this.width]);
 	// FIXME: this requires a maximum to come from the data
-	this.z = d3.scale.linear().domain([0, 1000]).clamp(true);
 	this.c = d3.scale.category10().domain(d3.range(10));
 
 	this.svg = d3.select(this.selector).append("svg")
@@ -32,6 +31,14 @@ Matrix.prototype.init = function() {
 	    .style("margin-left", this.margin.left + "px")
 	  .append("g")
 	    .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+}
+
+Matrix.prototype.setZScale = function(z_min, z_max) {
+	if ((z_max - z_min ) > 1000) {
+		this.z = d3.scale.pow().domain([z_min, z_max]).clamp(true);
+	} else {
+		this.z = d3.scale.linear().domain([z_min, z_max]).clamp(true);
+	}
 }
 
 Matrix.prototype.row = function(row) {
@@ -70,13 +77,19 @@ Matrix.prototype.loadNetwork = function(network) {
 		matrix.matrix[node.id] = [];
 	});
 
+	z_min = 9999999999999999;
+	z_max = 0
 	// Convert links to matrix; include link weight
 	network.links.forEach(function(link) {
+		z_min = Math.min(z_min, link.weight);
+		z_max = Math.max(z_max, link.weight);
 		src_node_id = network.nodes[link.source].id;
 		tgt_node_id = network.nodes[link.target].id;
 		matrix.matrix[src_node_id].push({s: src_node_id, t: tgt_node_id, z: link.weight});
 		matrix.matrix[tgt_node_id].push({s: tgt_node_id, t: src_node_id, z: link.weight});
 	});
+
+	this.setZScale(z_min, z_max);
 
 	// FIXME: need to copy over all the properties present in the nodes
 	data_to_bind = network.nodes.map(function(node) { return {id: node.id, country_code: node.country_code, region: node.region, links: matrix.matrix[node.id]}; });
