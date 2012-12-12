@@ -150,6 +150,7 @@ def upload_file(request):
         G.node[idx]['degree'] = G.degree(idx)
         G.node[idx]['degree_centrality'] = degree_centrality[idx]
         G.node[idx]['average_neighbor_degree'] = average_neighbor_degree[idx]
+        G.node[idx]['weight'] = G.degree(idx, 'weight')
 
     f = open("DATASETS/graph%s.pickle" % ds_id, 'w')
     pickle.dump(G, f)
@@ -181,7 +182,6 @@ def get_ds(request, ds_id):
 
     deg_dist = get_deg_dist(G)
     pageranks = get_pageranks(G)
-    pp.pprint(pageranks)
 
     json_data = json_graph.node_link_data(G)
     json_data['extra_graphs'] = [
