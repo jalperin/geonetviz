@@ -187,12 +187,16 @@ def get_ds(request, ds_id):
     json_data['extra_graphs'] = [
         {
             'title': 'Degree Distribution',
+            'y_label': 'Number of nodes',
+            'x_label': 'Number of neighbors (degree)',
             'type': 'bar',
             'scale': 'linear',
             'data': deg_dist,
         },
         {
-            'title': 'PageRanks',
+            'title': 'PageRank Distribution',
+            'x_label': 'Node rank',
+            'y_label': 'PageRank value',
             'type': 'bar',
             'scale': 'linear',
             'data': pageranks,

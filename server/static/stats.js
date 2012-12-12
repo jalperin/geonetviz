@@ -1,6 +1,6 @@
 function Stats() {
 	// parameters
-	this.margin = {top: 40, right: 10, bottom: 25, left: 60};
+	this.margin = {top: 40, right: 10, bottom: 45, left: 60};
 	this.width = 750; // width of each chart.
 	this.height = 200; // height of each chart.
 	this.selector = "#statsview > #stats";
@@ -40,23 +40,40 @@ Stats.prototype.init_one = function(idx) {
       .append("g")
         .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
+
+    // Title
+    this.svg[idx]
+      .append("text")
+        .attr("y", -15)
+        .attr("x", -30)
+        .style("font-size", "24px")
+        .text(this.data.extra_graphs[idx].title)
+
     x.domain([1, 2, 3, 4, 5])
     y.domain([0, 100])
 
     this.svg[idx].append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + this.height + ")")
-      .call(xAxis);
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + this.height + ")")
+        .call(xAxis);
+
+    this.svg[idx]
+      .append("text")
+        .attr("x", this.width/2)
+        .attr("y", this.height+30)
+        .style("text-anchor", "middle")
+        .text(this.data.extra_graphs[idx].x_label)
 
     this.svg[idx].append("g")
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", -40)
+      .attr("y", -50)
+      .attr("x", -100)
       .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Frequency");
+      .style("text-anchor", "middle")
+      .text(this.data.extra_graphs[idx].y_label)
 
     var height=this.height;
     bars = this.svg[idx].selectAll(".bar").data([1, 2, 3, 4, 5]);
@@ -72,12 +89,12 @@ Stats.prototype.init_one = function(idx) {
 }
 
 Stats.prototype.loadNetwork = function(network) {
+    this.data = network
+
     if (!this.has_init) {
         this.init(network.extra_graphs.length);
         this.has_init = true;
     }
-
-	this.data = network;
 
     this.data.extra_graphs.forEach(function(el, idx, arr) { stats.load_one(el.data, idx); })
 }
