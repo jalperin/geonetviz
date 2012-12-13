@@ -187,6 +187,8 @@
 			matrix.init();
             var stats = new Stats();
 
+            var sliderTimeout;
+
 			var views = [map, nodelink, matrix, stats];
 			var attributes = [];
 			var exclude_attributes = ['lat', 'lng', 'country_code', 'country_name', 'id', 'degree', 'pagerank', 'degree_centrality', 'average_neighbor_degree', 'closeness_vitality'];
@@ -247,7 +249,7 @@
                                 '<input type="text" class="sliderValue" data-index="1" value="'+data.max_edge_weight+'" />' +
                                 '</div>' +
                                 '<br />' +
-                                '<div id="slider"></div>';
+                                '<div id="slider" style="margin-left: 20px; margin-right: 20px;"></div>';
                         filter_DOM += '</li>';
                         filter_DOM += '</ul>';
                         filter_DOM += '</li>';
@@ -263,6 +265,13 @@
                                 for (var i = 0; i < ui.values.length; ++i) {
                                     $("input.sliderValue[data-index=" + i + "]").val(ui.values[i]);
                                 }
+                                if (sliderTimeout) { window.clearTimeout(sliderTimeout); }
+                                sliderTimeout = window.setTimeout(function() {
+                                    themin = ui.values[0];
+                                    themax = ui.values[1];
+                                    if (themax<themin) { var tmp = themin; themin=themax; themax=tmp; }
+                                    console.log("Updating slider weight min max to: " + themin + "," + themax)
+                                }, 2500)
                             }
                         });
 
