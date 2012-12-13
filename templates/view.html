@@ -288,7 +288,22 @@
 				});
 			}
 
-			function updateViews(ds_id, filters) {
+			function updateViews(ds_id) {
+				if (filters_initialized) {
+					var filters;
+
+					// build the filter from the menus
+					// FIXME: this should iterate through all attributes
+					attributes.forEach(function(attr)) {
+
+						// FIXME: dan, can you construct the filter here?
+						var checked = $.map($("#filter_" + attr + " > li > a.checked"), function(n,i) {
+						    return $(n).text();
+						});
+						filters += checked.join(',');
+					}
+				}
+
 				d3.json("/get/" + ds_id + "/?" + filters, function(network) {
 				if (!filters_initialized) {
 					buildFilterDropdown(network);
@@ -299,6 +314,8 @@
 					});
 				}
 				filters_initialized = true;
+
+
 
 				for ( var i=0; i < views.length; i++ ) {
 					var networkClone = jQuery.extend(true, {}, network);
