@@ -187,22 +187,22 @@ def get_ds(request, ds_id):
 
         if 'filters_continuous' in params and 'node' in params['filters_continuous']:
             for filter in params['filters_continuous']['node']:
-                max = params['filters_continuous']['node'][filter]['max']
-                min = params['filters_continuous']['node'][filter]['min']
+                curmax = params['filters_continuous']['node'][filter]['max']
+                curmin = params['filters_continuous']['node'][filter]['min']
                 SG = G.subgraph(
                     [n for n, attrdict in G.node.items() if
-                        attrdict[filter] <= max and
-                        attrdict[filter] >= min])
+                        attrdict[filter] <= curmax and
+                        attrdict[filter] >= curmin])
                 G=SG
 
         if 'filters_continuous' in params and 'edge' in params['filters_continuous']:
             for filter in params['filters_continuous']['edge']:
-                max = params['filters_continuous']['edge'][filter]['max']
-                min = params['filters_continuous']['edge'][filter]['min']
+                curmax = params['filters_continuous']['edge'][filter]['max']
+                curmin = params['filters_continuous']['edge'][filter]['min']
                 SG=nx.Graph()
                 SG.add_nodes_from(G.nodes(data=True))
                 SG.add_edges_from([ (u,v,d) for u,v,d in G.edges(data=True) if 
-                    d[filter]>=min and d[filter]<=max] )
+                    d[filter]>=curmin and d[filter]<=curmax] )
                 G=SG
 
     #pp.pprint(G.nodes(data=True))
@@ -259,6 +259,18 @@ def get_ds(request, ds_id):
         'connected_components': nx.number_connected_components(G),
         'diameter': avg_diameter,
     }
+
+    #quick hacks, someday TODO make this way better.
+    first = True
+    for (u,v,edge) in G.edges(data=True):
+        if first:
+            json_data['max_edge_weight'] = edge['weight']
+            json_data['min_edge_weight'] = edge['weight']
+            first = False
+        if edge['weight'] > json_data['max_edge_weight']:
+            json_data['max_edge_weight'] = edge['weight']
+        if edge['weight'] < json_data['min_edge_weight']:
+            json_data['min_edge_weight'] = edge['weight']
 
     return HttpResponse(json.dumps(json_data), mimetype="application/json")
 

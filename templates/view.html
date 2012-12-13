@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<title>GeoNetViz</title>
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
+        <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 		<script src="/static/bootstrap/js/bootstrap.min.js"></script>
 		<script src="/static/Tooltip.js"></script>
 
@@ -27,6 +28,7 @@
 		</script>
 
 		<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" rel="stylesheet" media="screen">
 		<link href="/static/style.css" rel="stylesheet" media="screen">
 
 		<style type="text/css">
@@ -238,7 +240,38 @@
 						}
 					}
 					if ( numeric ) {
-						// TODO: implement range filters for quantitative attributes
+						filter_DOM = '<li class="dropdown-submenu"><a id=filter_"' + attr + '" href="#"> by ' + attr + '</a>';
+                        filter_DOM += '<ul class="dropdown-menu">';
+                        filter_DOM += '<li>';
+                        filter_DOM += '    <div>' +
+                                '<input type="text" class="sliderValue" data-index="0" value="'+data.min_edge_weight+'" />' +
+                                '<input type="text" class="sliderValue" data-index="1" value="'+data.max_edge_weight+'" />' +
+                                '</div>' +
+                                '<br />' +
+                                '<div id="slider"></div>';
+                        filter_DOM += '</li>';
+                        filter_DOM += '</ul>';
+                        filter_DOM += '</li>';
+                        $('#filter-list').append(filter_DOM);
+
+                        // update slider info
+                        $("#slider").slider({
+                            min: data.min_edge_weight,
+                            max: data.max_edge_weight,
+                            step: 1,
+                            values: [data.min_edge_weight, data.max_edge_weight],
+                            slide: function(event, ui) {
+                                for (var i = 0; i < ui.values.length; ++i) {
+                                    $("input.sliderValue[data-index=" + i + "]").val(ui.values[i]);
+                                }
+                            }
+                        });
+
+                        $("input.sliderValue").change(function() {
+                            var $this = $(this);
+                            $("#slider").slider("values", $this.data("index"), $this.val());
+                        });
+
 					} else {
 						values = attribute_values[attr].unique().sort();
 
@@ -270,6 +303,7 @@
 					var networkClone = jQuery.extend(true, {}, network);
 					views[i].loadNetwork(networkClone);
 				}
+
 				});
 			}
 
