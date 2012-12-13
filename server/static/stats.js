@@ -154,9 +154,15 @@ Stats.prototype.load_one = function(data, idx) {
     bars
         .enter().append('rect')
         .attr('class', 'bar')
-        .on("mouseover", function(d){return tooltip.text(d.name).style("visibility", "visible");})
+        .on("mouseover", function(d,i){
+            d3.select(d3.event.target).classed("barhover", true);
+            return tooltip.text(d.name).style("visibility", "visible");
+        })
         .on("mousemove", function(d){return tooltip.text(d.name).style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
-        .on("mouseout", function(d){return tooltip.text(d.name).style("visibility", "hidden");});
+        .on("mouseout", function(d){
+            d3.select(d3.event.target).classed("barhover", false);
+            return tooltip.text(d.name).style("visibility", "hidden");
+        });
 
     bars
         .transition().duration(2000).delay(100)
