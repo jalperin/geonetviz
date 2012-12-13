@@ -116,29 +116,33 @@ Map.prototype.mouseover = function (p) {
 		}
 	}
 
-	content = '<p>' + node.country_name + ', ' + node.region + '</span></p>';
-	content += '<hr class="tooltip-hr">';
-    content += '<p>' + node.degree + ' links' + '; ' + Math.round(node.average_neighbor_degree) + ' avg neighbor links' + '</span></p>';
-	nodelink.tooltip.showTooltip(content,d3.event);
+	// FIXME: investigate the following
+	// not sure why this is null sometimes, but its giving an annoying error
+	if (node) {
+		content = '<p>' + node.country_name + ', ' + node.region + '</span></p>';
+		content += '<hr class="tooltip-hr">';
+	    content += '<p>' + node.degree + ' links' + '; ' + Math.round(node.average_neighbor_degree) + ' avg neighbor links' + '</span></p>';
+		nodelink.tooltip.showTooltip(content,d3.event);
 
-	// FIXME: bet it has to do with the fact that we are using nodelink.tooltip here rather than a map.tooltip
-	map.arc_group.selectAll("path")
-		.attr("opacity",
-			function(d) {
-				if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
-					return 1;
-				} else {
-					return .6;
-				}
-			})
-		.style("stroke",
-			function(d) {
-				if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
-					return '##999';
-				} else {
-					return '#ddd';
-				}
-			}) ;
+		// FIXME: bet it has to do with the fact that we are using nodelink.tooltip here rather than a map.tooltip
+		map.arc_group.selectAll("path")
+			.attr("opacity",
+				function(d) {
+					if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
+						return 1;
+					} else {
+						return .6;
+					}
+				})
+			.style("stroke",
+				function(d) {
+					if  (map.data.nodes[d.source].country_code == p.id || map.data.nodes[d.target].country_code == p.id) {
+						return '##999';
+					} else {
+						return '#ddd';
+					}
+				}) ;
+	}
 }
 
 Map.prototype.mouseout = function (p) {
