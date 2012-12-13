@@ -182,7 +182,7 @@ def get_ds(request, ds_id):
             for filter in params['filters']:
                 SG = G.subgraph(
                     [n for n, attrdict in G.node.items() if
-                        filter in attrdict and attrdict[filter] in params['filters'][filter]])
+                        filter in attrdict and attrdict[filter] not in params['filters'][filter]])
                 G=SG
 
         if 'filters_continuous' in params and 'node' in params['filters_continuous']:
