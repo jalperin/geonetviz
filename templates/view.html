@@ -223,8 +223,7 @@
 				data.nodes.forEach(function(node) {
 					attributes.forEach(function(attr) {
 						if ( !attribute_values[attr] ) attribute_values[attr] = []
-						// for some reason, attributes are encloded in "xxxxx"
-						attribute_values[attr].push(node[attr])
+						attribute_values[attr].push(node[attr]);
 					});
 				});
 
@@ -275,10 +274,12 @@
 					} else {
 						values = attribute_values[attr].unique().sort();
 
-						filter_DOM = '<li class="dropdown-submenu"><a id=filter_"' + attr + '" href="#"> by ' + attr + '</a>';
-							filter_DOM += '<ul class="dropdown-menu">';
+						filter_DOM = '<li class="dropdown-submenu"><a href="#"> by ' + attr + '</a>';
+							filter_DOM += '<ul id="filter_' + attr + '" class="dropdown-menu">';
 							values.forEach(function(val) {
-									filter_DOM += '<li><a href="#" onclick="updateViews(ds_id)" class="multicheck">' + val + '<span class="pull-right"></span></a></li>';
+									filter_DOM += '<li><a href="#" onclick="updateViews(ds_id)" class="multicheck unchecked">';
+									filter_DOM += val;
+									filter_DOM += '<span class="pull-right"></span></a></li>';
 								});
 							filter_DOM += '</ul>';
 						filter_DOM += '</li>';
@@ -292,7 +293,7 @@
 				if (!filters_initialized) {
 					buildFilterDropdown(network);
 					$('.multicheck').click(function(e) {
-						 $(this).toggleClass("checked");
+						 $(this).toggleClass("checked").toggleClass("unchecked");
 						 $(this).find("span").toggleClass("icon-remove");
 						 return false;
 					});
