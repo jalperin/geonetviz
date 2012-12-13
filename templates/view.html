@@ -186,6 +186,8 @@
 			var matrix = new Matrix();
 			matrix.init();
             var stats = new Stats();
+            var GLOBAL_EDGE_MIN = 0; // TODO a hack, again.
+            var GLOBAL_EDGE_MAX = 1000000;
 
             var sliderTimeout;
 
@@ -271,6 +273,9 @@
                                     themax = ui.values[1];
                                     if (themax<themin) { var tmp = themin; themin=themax; themax=tmp; }
                                     console.log("Updating slider weight min max to: " + themin + "," + themax)
+                                    GLOBAL_EDGE_MIN = themin;
+                                    GLOBAL_EDGE_MAX = themax;
+                                    updateViews(ds_id)
                                 }, 2500)
                             }
                         });
@@ -286,7 +291,7 @@
 						filter_DOM = '<li class="dropdown-submenu"><a href="#"> by ' + attr + '</a>';
 							filter_DOM += '<ul id="filter_' + attr + '" class="dropdown-menu">';
 							values.forEach(function(val) {
-									filter_DOM += '<li><a href="#" onclick="updateViews(ds_id)" class="multicheck unchecked">';
+									filter_DOM += '<li><a href="#" onclick="window.setTimeout(function() {updateViews(ds_id)}, 1000)" class="multicheck unchecked">';  // THIS IS A HACK^10
 									filter_DOM += val;
 									filter_DOM += '<span class="pull-right"></span></a></li>';
 								});
@@ -298,38 +303,62 @@
 			}
 
 			function updateViews(ds_id) {
+                console.log(filters_initialized)
+                var djsend = {}
 				if (filters_initialized) {
-					var filters;
+					var filters = {};
+                    var filters_continuous = {};
 
 					// build the filter from the menus
 					// FIXME: this should iterate through all attributes
 					attributes.forEach(function(attr) {
 
-						// FIXME: dan, can you construct the filter here?
-						var checked = $.map($("#filter_" + attr + " > li > a.checked"), function(n,i) {
-						    return $(n).text();
-						});
-						filters += checked.join(',');
+                        // TODO ANOTHER HACK
+                        if (attr == 'weight') {
+                            filters_continuous['edge'] = {}
+                            filters_continuous['edge']['weight'] = {}
+                            filters_continuous['edge']['weight']['min'] = GLOBAL_EDGE_MIN;
+                            filters_continuous['edge']['weight']['max'] = GLOBAL_EDGE_MAX;
+                        } else {
+                            // FIXME: dan, can you construct the filter here?
+                            var checked = $.map($("#filter_" + attr + " > li > a.checked"), function(n,i) {
+                                return $(n).text();
+                            });
+                            //checked.forEach(function(filter) { console.log(filter); })
+                            if (checked.length>0) {
+                                filters[attr] = checked;
+                            }
+                        }
 					});
+
+                    djsend = {
+                        'filters': filters,
+                        'filters_continuous': filters_continuous,
+                    };
+                    console.log(djsend);
 				}
 
-				d3.json("/get/" + ds_id + "/?" + filters, function(network) {
-				if (!filters_initialized) {
-					buildFilterDropdown(network);
-					$('.multicheck').click(function(e) {
-						 $(this).toggleClass("checked").toggleClass("unchecked");
-						 $(this).find("span").toggleClass("icon-remove");
-						 return false;
-					});
-				}
-				filters_initialized = true;
+                
+				d3.json("/get/" + ds_id + "/?json=" + JSON.stringify(djsend), function(network) {
+                    console.log(JSON.stringify(djsend))
+                //$.get("/get/" + ds_id + "/", {json: JSON.stringify(djsend)}, function(data) {
+                    //network = JSON.parse(data);
+                    //console.log(network)
 
+                    if (!filters_initialized) {
+                        buildFilterDropdown(network);
+                        $('.multicheck').click(function(e) {
+                             $(this).toggleClass("checked").toggleClass("unchecked");
+                             $(this).find("span").toggleClass("icon-remove");
+                             return false;
+                        });
+                    }
+                    filters_initialized = true;
 
-
-				for ( var i=0; i < views.length; i++ ) {
-					var networkClone = jQuery.extend(true, {}, network);
-					views[i].loadNetwork(networkClone);
-				}
+                    for ( var i=0; i < views.length; i++ ) {
+                        var networkClone = jQuery.extend(true, {}, network);
+                        views[i].loadNetwork(networkClone);
+                    }
 
 				});
 			}
